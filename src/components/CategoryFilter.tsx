@@ -34,6 +34,25 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   other: MoreHorizontal,
 };
 
+// Colorful icon colors for each category
+const categoryIconColors: Record<FemtechCategory | 'all', string> = {
+  all: 'text-teal',
+  fertility: 'text-pink-500',
+  pregnancy: 'text-coral',
+  postpartum: 'text-rose-400',
+  menstrual_health: 'text-purple-500',
+  menopause: 'text-amber-500',
+  sexual_health: 'text-red-400',
+  mental_health: 'text-indigo-500',
+  general_wellness: 'text-emerald-500',
+  chronic_conditions: 'text-slate-500',
+  diagnostics: 'text-cyan-500',
+  telehealth: 'text-blue-500',
+  investors: 'text-green-600',
+  resources_community: 'text-violet-500',
+  other: 'text-gray-500',
+};
+
 interface CategoryFilterProps {
   selectedCategory: FemtechCategory | 'all';
   onCategoryChange: (category: FemtechCategory | 'all') => void;
@@ -64,6 +83,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
           {categories.map((category) => {
             const Icon = category === 'all' ? Stethoscope : categoryIcons[category];
             const isSelected = selectedCategory === category;
+            const iconColor = categoryIconColors[category];
             
             return (
               <Button
@@ -74,12 +94,12 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
                 className={`
                   rounded-full px-4 transition-all duration-200
                   ${isSelected 
-                    ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'hover:bg-primary/10 hover:border-primary'
+                    ? 'bg-lavender text-foreground shadow-md border-lavender hover:bg-lavender/90' 
+                    : 'hover:bg-blush hover:border-lavender/50'
                   }
                 `}
               >
-                <Icon className="mr-2 h-4 w-4" />
+                <Icon className={`mr-2 h-4 w-4 ${isSelected ? 'text-foreground' : iconColor}`} />
                 {category === 'all' ? 'All Categories' : categoryLabels[category]}
               </Button>
             );
