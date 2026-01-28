@@ -54,7 +54,7 @@ export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">14</span>
+              <span className="block text-2xl font-bold text-foreground">13</span>
               <span className="text-muted-foreground">Categories</span>
             </div>
             <div className="h-8 w-px bg-border" />
