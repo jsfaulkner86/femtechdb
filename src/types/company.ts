@@ -10,6 +10,7 @@ export type FemtechCategory =
   | 'chronic_conditions'
   | 'diagnostics'
   | 'telehealth'
+  | 'precision_medicine_ai'
   | 'investors'
   | 'resources_community'
   | 'other';
@@ -42,6 +43,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   chronic_conditions: 'Chronic Conditions',
   diagnostics: 'Diagnostics',
   telehealth: 'Telehealth',
+  precision_medicine_ai: 'Precision Medicine & AI',
   investors: 'Investors & Funds',
   resources_community: 'Resources & Community',
   other: 'Other',
@@ -59,6 +61,7 @@ export const categoryColors: Record<FemtechCategory, string> = {
   chronic_conditions: 'bg-muted text-foreground',
   diagnostics: 'bg-secondary text-secondary-foreground',
   telehealth: 'bg-teal text-primary-foreground',
+  precision_medicine_ai: 'bg-primary text-primary-foreground',
   investors: 'bg-primary text-primary-foreground',
   resources_community: 'bg-accent text-accent-foreground',
   other: 'bg-muted text-muted-foreground',
