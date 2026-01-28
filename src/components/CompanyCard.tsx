@@ -1,10 +1,10 @@
-import { ExternalLink, MapPin, Calendar, BadgeCheck } from 'lucide-react';
+import { ExternalLink, MapPin, Calendar, BadgeCheck, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
-
+import { formatDistanceToNow } from 'date-fns';
 interface CompanyCardProps {
   company: Company;
   onClick: () => void;
@@ -88,18 +88,33 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-4 pt-2 text-xs text-muted-foreground">
-          {company.headquarters && (
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span className="truncate">{company.headquarters}</span>
-            </div>
-          )}
-          {company.founded_year && (
-            <div className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              <span>{company.founded_year}</span>
-            </div>
+        <div className="flex items-center justify-between gap-4 pt-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-4">
+            {company.headquarters && (
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span className="truncate">{company.headquarters}</span>
+              </div>
+            )}
+            {company.founded_year && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                <span>{company.founded_year}</span>
+              </div>
+            )}
+          </div>
+          {company.updated_at && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 text-muted-foreground/60 cursor-help">
+                  <Clock className="h-3 w-3" />
+                  <span>{formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p className="text-xs">Last updated: {new Date(company.updated_at).toLocaleDateString()}</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
       </CardContent>

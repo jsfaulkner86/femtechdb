@@ -27,6 +27,7 @@ export interface Company {
   founded_year: number | null;
   headquarters: string | null;
   is_verified: boolean;
+  source_url: string | null;
   created_at: string;
   updated_at: string;
 }
