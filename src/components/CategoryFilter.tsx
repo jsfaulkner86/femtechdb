@@ -77,7 +77,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
   ];
 
   return (
-    <div className="pt-3 pb-6">
+    <div className="pt-0 pb-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap gap-2 justify-center">
           {categories.map((category) => {
