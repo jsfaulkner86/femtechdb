@@ -30,6 +30,7 @@ const FEMTECH_CATEGORIES = [
   'diagnostics',
   'telehealth',
   'investors',
+  'resources_community',
   'other'
 ];
 
