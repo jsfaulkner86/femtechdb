@@ -1,11 +1,11 @@
-import { ExternalLink, MapPin, Calendar, BadgeCheck, Target, Lightbulb } from 'lucide-react';
+import { ExternalLink, MapPin, Calendar, BadgeCheck, Target, Lightbulb, Clock, Link2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
-
+import { formatDistanceToNow, format } from 'date-fns';
 interface CompanyModalProps {
   company: Company | null;
   isOpen: boolean;
@@ -110,6 +110,37 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
               </div>
             )}
           </div>
+
+          {/* Last Updated */}
+          {company.updated_at && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-muted/50 rounded-lg px-3 py-2">
+              <Clock className="h-3.5 w-3.5" />
+              <span>
+                Last updated {formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}
+                <span className="mx-1">•</span>
+                {format(new Date(company.updated_at), 'MMM d, yyyy')}
+              </span>
+            </div>
+          )}
+
+          {/* Source Citation */}
+          {company.source_url && (
+            <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+                <Link2 className="h-3.5 w-3.5" />
+                <span className="font-medium">Source</span>
+              </div>
+              <a 
+                href={company.source_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline break-all"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {new URL(company.source_url).hostname.replace('www.', '')}
+              </a>
+            </div>
+          )}
 
           {/* CTA */}
           {company.website_url && (

@@ -27,6 +27,7 @@ export type Database = {
           name: string
           problem: string | null
           solution: string | null
+          source_url: string | null
           updated_at: string
           website_url: string | null
         }
@@ -42,6 +43,7 @@ export type Database = {
           name: string
           problem?: string | null
           solution?: string | null
+          source_url?: string | null
           updated_at?: string
           website_url?: string | null
         }
@@ -57,6 +59,7 @@ export type Database = {
           name?: string
           problem?: string | null
           solution?: string | null
+          source_url?: string | null
           updated_at?: string
           website_url?: string | null
         }
