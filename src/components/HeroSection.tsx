@@ -49,7 +49,7 @@ export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
           {/* Stats */}
           <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">500+</span>
+              <span className="block text-2xl font-bold text-foreground">475+</span>
               <span className="text-muted-foreground">Companies</span>
             </div>
             <div className="h-8 w-px bg-border" />
