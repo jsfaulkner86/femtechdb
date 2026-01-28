@@ -72,8 +72,34 @@ Deno.serve(async (req) => {
     const userId = claimsData.claims.sub;
     console.log(`Authenticated user: ${userId}`);
 
-    // Use service role for database operations
+    // Use service role for database operations (needed to check roles and insert companies)
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check if user has admin role before allowing any operations
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError) {
+      console.error('Role check error:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to verify permissions' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!roleData) {
+      console.log(`User ${userId} attempted admin action without admin role`);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - admin role required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Admin access verified for user: ${userId}`);
 
     // Get existing company names to avoid duplicates
     const { data: existingCompanies } = await supabase
