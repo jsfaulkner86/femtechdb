@@ -15,7 +15,14 @@ import {
   MoreHorizontal,
   TrendingUp,
   Users,
-  Cpu
+  Cpu,
+  HeartPulse,
+  Bone,
+  Ribbon,
+  ShieldPlus,
+  Droplets,
+  CircleDot,
+  Waves
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
@@ -33,6 +40,15 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   precision_medicine_ai: Cpu,
   investors: TrendingUp,
   resources_community: Users,
+  reproductive_health: Flower2,
+  maternal_health: Baby,
+  hormonal_health: Droplets,
+  gynecological_health: ShieldPlus,
+  endometriosis: CircleDot,
+  heart_disease: HeartPulse,
+  pelvic_health: Waves,
+  bone_health: Bone,
+  cancer: Ribbon,
   other: MoreHorizontal,
 };
 
@@ -53,6 +69,15 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   precision_medicine_ai: 'text-fuchsia-500',
   investors: 'text-green-600',
   resources_community: 'text-violet-500',
+  reproductive_health: 'text-pink-400',
+  maternal_health: 'text-orange-400',
+  hormonal_health: 'text-yellow-500',
+  gynecological_health: 'text-teal-500',
+  endometriosis: 'text-purple-400',
+  heart_disease: 'text-red-500',
+  pelvic_health: 'text-blue-400',
+  bone_health: 'text-gray-500',
+  cancer: 'text-pink-600',
   other: 'text-gray-500',
 };
 
@@ -65,14 +90,23 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
   const categories: (FemtechCategory | 'all')[] = [
     'all',
     'fertility',
+    'reproductive_health',
     'pregnancy',
+    'maternal_health',
     'postpartum',
     'menstrual_health',
     'menopause',
+    'hormonal_health',
     'sexual_health',
     'mental_health',
-    'general_wellness',
+    'gynecological_health',
+    'endometriosis',
+    'pelvic_health',
     'chronic_conditions',
+    'heart_disease',
+    'bone_health',
+    'cancer',
+    'general_wellness',
     'diagnostics',
     'telehealth',
     'precision_medicine_ai',

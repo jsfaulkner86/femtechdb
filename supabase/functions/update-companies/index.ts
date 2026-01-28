@@ -32,6 +32,15 @@ const FEMTECH_CATEGORIES = [
   'precision_medicine_ai',
   'investors',
   'resources_community',
+  'reproductive_health',
+  'maternal_health',
+  'hormonal_health',
+  'gynecological_health',
+  'endometriosis',
+  'heart_disease',
+  'pelvic_health',
+  'bone_health',
+  'cancer',
   'other'
 ];
 
@@ -119,18 +128,27 @@ Deno.serve(async (req) => {
 SEARCH ACROSS ALL THESE CATEGORIES:
 1. Fertility (IVF, egg freezing, fertility tracking, male fertility)
 2. Pregnancy (prenatal care, pregnancy monitoring, genetic testing)
-3. Postpartum (pelvic floor health, lactation, recovery, maternal mental health)
+3. Postpartum (pelvic floor health, lactation, recovery)
 4. Menstrual Health (period tracking, menstrual products, cycle disorders)
 5. Menopause & Perimenopause (hormone therapy, symptom management, wearables)
-6. Sexual Health (intimacy wellness, sexual dysfunction, education)
+6. Sexual Health/Wellness (intimacy wellness, sexual dysfunction, education)
 7. Mental Health (women-focused therapy, perinatal mental health, hormonal mood)
 8. General Wellness (supplements, fitness, nutrition for women)
-9. Chronic Conditions (endometriosis, PCOS, fibroids, adenomyosis)
+9. Chronic Conditions (PCOS, fibroids, adenomyosis)
 10. Diagnostics (at-home testing, cancer screening, biomarkers)
 11. Telehealth (virtual care, digital therapeutics, remote monitoring)
 12. Precision Medicine & AI (genomics, personalized treatment, AI diagnostics)
 13. Investors & Funds (VCs, angels, funds focused on women's health)
 14. Resources & Community (education, advocacy, networks, media)
+15. Reproductive Health (contraception, family planning, reproductive rights)
+16. Maternal Health (prenatal, birth, postpartum care continuity)
+17. Hormonal Health (hormone testing, HRT, thyroid, adrenal)
+18. Gynecological Health (gynecological care, exams, treatments)
+19. Endometriosis (diagnosis, treatment, pain management for endo)
+20. Heart Disease (cardiovascular health specific to women)
+21. Pelvic Health (pelvic floor disorders, prolapse, incontinence)
+22. Bone Health (osteoporosis, bone density, calcium metabolism)
+23. Cancer (breast cancer, ovarian cancer, cervical cancer, women's oncology)
 
 RESEARCH SOURCES TO CONSIDER:
 - Femtech Insider, FemTech World, Rock Health reports
@@ -147,7 +165,7 @@ For each company, provide information in this exact JSON format:
       "mission": "Their mission statement or purpose",
       "problem": "The specific women's health problem they address",
       "solution": "How their product/service solves this problem",
-      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, other",
+      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, reproductive_health, maternal_health, hormonal_health, gynecological_health, endometriosis, heart_disease, pelvic_health, bone_health, cancer, other",
       "website_url": "https://their-website.com",
       "founded_year": 2022,
       "headquarters": "City, Country"

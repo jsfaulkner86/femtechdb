@@ -156,6 +156,15 @@ export type Database = {
         | "investors"
         | "resources_community"
         | "precision_medicine_ai"
+        | "reproductive_health"
+        | "maternal_health"
+        | "hormonal_health"
+        | "gynecological_health"
+        | "endometriosis"
+        | "heart_disease"
+        | "pelvic_health"
+        | "bone_health"
+        | "cancer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -300,6 +309,15 @@ export const Constants = {
         "investors",
         "resources_community",
         "precision_medicine_ai",
+        "reproductive_health",
+        "maternal_health",
+        "hormonal_health",
+        "gynecological_health",
+        "endometriosis",
+        "heart_disease",
+        "pelvic_health",
+        "bone_health",
+        "cancer",
       ],
     },
   },

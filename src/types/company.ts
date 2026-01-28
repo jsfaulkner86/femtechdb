@@ -13,6 +13,15 @@ export type FemtechCategory =
   | 'precision_medicine_ai'
   | 'investors'
   | 'resources_community'
+  | 'reproductive_health'
+  | 'maternal_health'
+  | 'hormonal_health'
+  | 'gynecological_health'
+  | 'endometriosis'
+  | 'heart_disease'
+  | 'pelvic_health'
+  | 'bone_health'
+  | 'cancer'
   | 'other';
 
 export interface Company {
@@ -38,7 +47,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   postpartum: 'Postpartum',
   menstrual_health: 'Menstrual Health',
   menopause: 'Menopause',
-  sexual_health: 'Sexual Health',
+  sexual_health: 'Sexual Wellness',
   mental_health: 'Mental Health',
   general_wellness: 'General Wellness',
   chronic_conditions: 'Chronic Conditions',
@@ -47,6 +56,15 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   precision_medicine_ai: 'Precision Medicine & AI',
   investors: 'Investors & Funds',
   resources_community: 'Resources & Community',
+  reproductive_health: 'Reproductive Health',
+  maternal_health: 'Maternal Health',
+  hormonal_health: 'Hormonal Health',
+  gynecological_health: 'Gynecological Health',
+  endometriosis: 'Endometriosis',
+  heart_disease: 'Heart Disease',
+  pelvic_health: 'Pelvic Health',
+  bone_health: 'Bone Health',
+  cancer: 'Cancer',
   other: 'Other',
 };
 
@@ -65,5 +83,14 @@ export const categoryColors: Record<FemtechCategory, string> = {
   precision_medicine_ai: 'bg-primary text-primary-foreground',
   investors: 'bg-primary text-primary-foreground',
   resources_community: 'bg-accent text-accent-foreground',
+  reproductive_health: 'bg-coral text-primary-foreground',
+  maternal_health: 'bg-salmon text-primary-foreground',
+  hormonal_health: 'bg-sage text-primary-foreground',
+  gynecological_health: 'bg-accent text-accent-foreground',
+  endometriosis: 'bg-lavender text-foreground',
+  heart_disease: 'bg-coral text-primary-foreground',
+  pelvic_health: 'bg-teal text-primary-foreground',
+  bone_health: 'bg-muted text-foreground',
+  cancer: 'bg-secondary text-secondary-foreground',
   other: 'bg-muted text-muted-foreground',
 };
