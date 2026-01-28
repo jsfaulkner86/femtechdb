@@ -14,7 +14,8 @@ import {
   Moon,
   MoreHorizontal,
   TrendingUp,
-  Users
+  Users,
+  Cpu
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
@@ -29,6 +30,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   chronic_conditions: Pill,
   diagnostics: TestTube,
   telehealth: Video,
+  precision_medicine_ai: Cpu,
   investors: TrendingUp,
   resources_community: Users,
   other: MoreHorizontal,
@@ -48,6 +50,7 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   chronic_conditions: 'text-slate-500',
   diagnostics: 'text-cyan-500',
   telehealth: 'text-blue-500',
+  precision_medicine_ai: 'text-fuchsia-500',
   investors: 'text-green-600',
   resources_community: 'text-violet-500',
   other: 'text-gray-500',
@@ -72,6 +75,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
     'chronic_conditions',
     'diagnostics',
     'telehealth',
+    'precision_medicine_ai',
     'investors',
     'resources_community',
   ];
