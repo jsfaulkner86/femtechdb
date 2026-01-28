@@ -1,8 +1,9 @@
-import { ExternalLink, MapPin, Calendar, CheckCircle2, X, Target, Lightbulb } from 'lucide-react';
+import { ExternalLink, MapPin, Calendar, BadgeCheck, Target, Lightbulb } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
 
 interface CompanyModalProps {
@@ -25,7 +26,17 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
                   {company.name}
                 </DialogTitle>
                 {company.is_verified && (
-                  <CheckCircle2 className="h-5 w-5 text-sage" />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <BadgeCheck className="h-5 w-5 text-sage cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p className="font-medium">Verified Company</p>
+                      <p className="text-xs text-muted-foreground">
+                        This company has been independently verified by our team.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
               
