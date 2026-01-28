@@ -1,4 +1,5 @@
 import { Heart } from 'lucide-react';
+import { SubmitCompanyForm } from './SubmitCompanyForm';
 
 export function Footer() {
   return (
@@ -14,9 +15,12 @@ export function Footer() {
             </span>
           </div>
 
-          <p className="text-sm text-muted-foreground text-center">
-            Empowering discovery of women's health innovation.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Empowering discovery of women's health innovation.
+            </p>
+            <SubmitCompanyForm />
+          </div>
 
           <p className="text-xs text-muted-foreground">
             Updated daily • {new Date().getFullYear()}

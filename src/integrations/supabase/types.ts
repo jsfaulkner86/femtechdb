@@ -62,6 +62,45 @@ export type Database = {
         }
         Relationships: []
       }
+      company_submissions: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          company_name: string
+          created_at: string
+          description: string | null
+          id: string
+          reviewed_at: string | null
+          status: string
+          submitter_email: string | null
+          website_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          category: string
+          company_name: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          submitter_email?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          company_name?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          submitter_email?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -114,7 +114,30 @@ Deno.serve(async (req) => {
     console.log(`Found ${existingNames.size} existing companies`);
 
     // Use Lovable AI to research new femtech companies
-    const prompt = `You are a femtech industry researcher. Research and identify 5 NEW and INNOVATIVE femtech companies that are making an impact in women's health. Focus on companies founded in the last 3 years or recent funding rounds.
+    const prompt = `You are a femtech industry expert and researcher. Your task is to identify 5 NEW and INNOVATIVE femtech companies that should be added to our comprehensive database.
+
+SEARCH ACROSS ALL THESE CATEGORIES:
+1. Fertility (IVF, egg freezing, fertility tracking, male fertility)
+2. Pregnancy (prenatal care, pregnancy monitoring, genetic testing)
+3. Postpartum (pelvic floor health, lactation, recovery, maternal mental health)
+4. Menstrual Health (period tracking, menstrual products, cycle disorders)
+5. Menopause & Perimenopause (hormone therapy, symptom management, wearables)
+6. Sexual Health (intimacy wellness, sexual dysfunction, education)
+7. Mental Health (women-focused therapy, perinatal mental health, hormonal mood)
+8. General Wellness (supplements, fitness, nutrition for women)
+9. Chronic Conditions (endometriosis, PCOS, fibroids, adenomyosis)
+10. Diagnostics (at-home testing, cancer screening, biomarkers)
+11. Telehealth (virtual care, digital therapeutics, remote monitoring)
+12. Precision Medicine & AI (genomics, personalized treatment, AI diagnostics)
+13. Investors & Funds (VCs, angels, funds focused on women's health)
+14. Resources & Community (education, advocacy, networks, media)
+
+RESEARCH SOURCES TO CONSIDER:
+- Femtech Insider, FemTech World, Rock Health reports
+- Recent funding announcements (TechCrunch, Crunchbase, PitchBook)
+- Y Combinator, Techstars, and other accelerator portfolios
+- LinkedIn company pages and industry groups
+- Academic spin-offs and research commercialization
 
 For each company, provide information in this exact JSON format:
 {
@@ -124,7 +147,7 @@ For each company, provide information in this exact JSON format:
       "mission": "Their mission statement or purpose",
       "problem": "The specific women's health problem they address",
       "solution": "How their product/service solves this problem",
-      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, other",
+      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, other",
       "website_url": "https://their-website.com",
       "founded_year": 2022,
       "headquarters": "City, Country"
@@ -135,9 +158,11 @@ For each company, provide information in this exact JSON format:
 IMPORTANT: 
 - Only include REAL companies that actually exist
 - Do not include these companies as they're already in our database: ${Array.from(existingNames).join(', ')}
+- Include companies with less common names that might be missed by simple searches (e.g., "Amie", "Bia", single-word names)
 - The category must be exactly one of the listed options
 - founded_year should be a number or null if unknown
-- Provide accurate, verifiable information`;
+- Provide accurate, verifiable information
+- Prioritize lesser-known companies over well-funded unicorns`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
