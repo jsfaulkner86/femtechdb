@@ -1,18 +1,20 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-
 interface HeroSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
 }
-
-export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
-  return (
-    <section className="relative overflow-hidden bg-gradient-subtle py-20 md:py-28">
+export function HeroSection({
+  searchQuery,
+  onSearchChange
+}: HeroSectionProps) {
+  return <section className="relative overflow-hidden bg-gradient-subtle py-20 md:py-28">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-coral/10 blur-3xl animate-float" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl animate-float" style={{
+        animationDelay: '2s'
+      }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-lavender/5 blur-3xl" />
       </div>
 
@@ -22,39 +24,42 @@ export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
             Discover Women's Health Innovation
           </span>
           
-          <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl animate-fade-in" style={{
+          animationDelay: '0.1s'
+        }}>
             The Global{' '}
             <span className="text-gradient">Femtech</span>
             {' '}Directory
           </h1>
           
-          <p className="mt-6 text-lg text-muted-foreground md:text-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Explore innovative companies transforming women's health. Find solutions for fertility, pregnancy, menopause, and beyond.
-          </p>
+          <p className="mt-6 text-lg text-muted-foreground md:text-xl animate-fade-in" style={{
+          animationDelay: '0.2s'
+        }}>Explore innovative companies transforming women's health. 
+
+
+Find solutions for fertility, pregnancy, menopause, and beyond.</p>
 
           {/* Search Bar */}
-          <div className="mt-10 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="mt-10 animate-fade-in" style={{
+          animationDelay: '0.3s'
+        }}>
             <div className="relative mx-auto max-w-xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search companies, solutions, health areas..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300"
-              />
+              <Input type="search" placeholder="Search companies, solutions, health areas..." value={searchQuery} onChange={e => onSearchChange(e.target.value)} className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300" />
             </div>
           </div>
 
           {/* Stats */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm animate-fade-in" style={{
+          animationDelay: '0.4s'
+        }}>
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">535+</span>
+              <span className="block text-2xl font-bold text-foreground">500+</span>
               <span className="text-muted-foreground">Companies</span>
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">13</span>
+              <span className="block text-2xl font-bold text-foreground">12</span>
               <span className="text-muted-foreground">Categories</span>
             </div>
             <div className="h-8 w-px bg-border" />
@@ -65,6 +70,5 @@ export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
