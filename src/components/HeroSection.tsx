@@ -34,10 +34,11 @@ export function HeroSection({
           
           <p className="mt-6 text-lg text-muted-foreground md:text-xl animate-fade-in" style={{
           animationDelay: '0.2s'
-        }}>Explore innovative companies transforming women's health. 
-
-
-Find solutions for fertility, pregnancy, menopause, and beyond.</p>
+        }}>
+            Explore innovative companies transforming women's health.
+            <br />
+            Find solutions for fertility, pregnancy, menopause, and beyond.
+          </p>
 
           {/* Search Bar */}
           <div className="mt-10 animate-fade-in" style={{
