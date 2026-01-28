@@ -10,6 +10,7 @@ export type FemtechCategory =
   | 'chronic_conditions'
   | 'diagnostics'
   | 'telehealth'
+  | 'investors'
   | 'other';
 
 export interface Company {
@@ -40,6 +41,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   chronic_conditions: 'Chronic Conditions',
   diagnostics: 'Diagnostics',
   telehealth: 'Telehealth',
+  investors: 'Investors & Funds',
   other: 'Other',
 };
 
@@ -55,5 +57,6 @@ export const categoryColors: Record<FemtechCategory, string> = {
   chronic_conditions: 'bg-muted text-foreground',
   diagnostics: 'bg-secondary text-secondary-foreground',
   telehealth: 'bg-teal text-primary-foreground',
+  investors: 'bg-primary text-primary-foreground',
   other: 'bg-muted text-muted-foreground',
 };

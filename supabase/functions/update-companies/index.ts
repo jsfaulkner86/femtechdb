@@ -29,6 +29,7 @@ const FEMTECH_CATEGORIES = [
   'chronic_conditions',
   'diagnostics',
   'telehealth',
+  'investors',
   'other'
 ];
 

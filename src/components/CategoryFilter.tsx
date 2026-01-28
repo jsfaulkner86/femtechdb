@@ -12,7 +12,8 @@ import {
   Video,
   TestTube,
   Moon,
-  MoreHorizontal
+  MoreHorizontal,
+  TrendingUp
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
@@ -27,6 +28,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   chronic_conditions: Pill,
   diagnostics: TestTube,
   telehealth: Video,
+  investors: TrendingUp,
   other: MoreHorizontal,
 };
 
@@ -49,6 +51,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
     'chronic_conditions',
     'diagnostics',
     'telehealth',
+    'investors',
   ];
 
   return (
