@@ -17,7 +17,9 @@ export function useCompanies({ search, category }: UseCompaniesOptions = {}) {
         .order('name');
 
       if (search && search.trim()) {
-        query = query.or(`name.ilike.%${search}%,mission.ilike.%${search}%,problem.ilike.%${search}%,solution.ilike.%${search}%`);
+        // Sanitize search input: trim, limit length, and escape ILIKE pattern characters
+        const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
+        query = query.or(`name.ilike.%${sanitizedSearch}%,mission.ilike.%${sanitizedSearch}%,problem.ilike.%${sanitizedSearch}%,solution.ilike.%${sanitizedSearch}%`);
       }
 
       if (category && category !== 'all') {

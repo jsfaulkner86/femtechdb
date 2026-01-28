@@ -104,10 +104,12 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
           {company.website_url && (
             <Button 
               className="w-full"
-              onClick={() => window.open(company.website_url!, '_blank')}
+              asChild
             >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Visit Website
+              <a href={company.website_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Visit Website
+              </a>
             </Button>
           )}
         </div>

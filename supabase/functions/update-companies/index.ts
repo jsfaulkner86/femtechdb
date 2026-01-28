@@ -159,7 +159,7 @@ IMPORTANT:
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI API error:', errorText);
-      throw new Error(`AI API error: ${aiResponse.status}`);
+      throw new Error('AI_SERVICE_ERROR');
     }
 
     const aiData = await aiResponse.json();
@@ -180,7 +180,7 @@ IMPORTANT:
       companiesData = JSON.parse(jsonString.trim());
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
-      throw new Error('Failed to parse company data from AI');
+      throw new Error('PARSE_ERROR');
     }
 
     // Validate and insert new companies
@@ -222,7 +222,7 @@ IMPORTANT:
 
       if (insertError) {
         console.error('Insert error:', insertError);
-        throw insertError;
+        throw new Error('INSERT_ERROR');
       }
 
       console.log(`Inserted ${insertedData?.length || 0} new companies`);
@@ -248,10 +248,11 @@ IMPORTANT:
 
   } catch (error) {
     console.error('Error in update-companies:', error);
+    // Return generic error message to clients - detailed errors only in server logs
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Failed to update companies. Please try again later.',
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

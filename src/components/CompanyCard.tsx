@@ -43,12 +43,12 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(company.website_url!, '_blank');
-              }}
+              asChild
+              onClick={(e) => e.stopPropagation()}
             >
-              <ExternalLink className="h-4 w-4" />
+              <a href={company.website_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4" />
+              </a>
             </Button>
           )}
         </div>
