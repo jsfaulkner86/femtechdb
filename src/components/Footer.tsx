@@ -1,4 +1,5 @@
 import { Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { SubmitCompanyForm } from './SubmitCompanyForm';
 
 export function Footer() {
@@ -16,9 +17,10 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <p className="text-sm text-muted-foreground text-center">
-              Empowering discovery of women's health innovation.
-            </p>
+            <nav className="flex items-center gap-4 text-sm text-muted-foreground">
+              <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+              <Link to="/methodology" className="hover:text-foreground transition-colors">Methodology</Link>
+            </nav>
             <SubmitCompanyForm />
           </div>
 

@@ -21,6 +21,9 @@ export function Header() {
           <a href="/#categories" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Categories
           </a>
+          <Link to="/methodology" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Methodology
+          </Link>
           <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             About
           </Link>

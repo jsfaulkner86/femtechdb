@@ -1,7 +1,8 @@
-import { ExternalLink, MapPin, Calendar, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, MapPin, Calendar, BadgeCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
 
 interface CompanyCardProps {
@@ -26,7 +27,17 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
                 {company.name}
               </h3>
               {company.is_verified && (
-                <CheckCircle2 className="h-4 w-4 text-sage flex-shrink-0" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <BadgeCheck className="h-5 w-5 text-sage flex-shrink-0 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p className="font-medium">Verified Company</p>
+                    <p className="text-xs text-muted-foreground">
+                      This company has been independently verified by our team.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
             
