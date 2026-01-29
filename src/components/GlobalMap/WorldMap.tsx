@@ -95,7 +95,7 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
                       style={{
                         default: {
                           fill: hasCompanies 
-                            ? 'hsl(var(--primary) / 0.2)' 
+                            ? 'hsl(var(--accent) / 0.15)' 
                             : 'hsl(var(--muted) / 0.3)',
                           stroke: 'hsl(var(--border) / 0.5)',
                           strokeWidth: 0.5,
@@ -104,16 +104,16 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
                         },
                         hover: {
                           fill: hasCompanies 
-                            ? 'hsl(var(--primary) / 0.4)' 
+                            ? 'hsl(var(--accent) / 0.35)' 
                             : 'hsl(var(--muted) / 0.4)',
-                          stroke: 'hsl(var(--primary))',
+                          stroke: 'hsl(var(--accent))',
                           strokeWidth: 1,
                           outline: 'none',
                           cursor: hasCompanies ? 'pointer' : 'default',
                         },
                         pressed: {
-                          fill: 'hsl(var(--primary) / 0.5)',
-                          stroke: 'hsl(var(--primary))',
+                          fill: 'hsl(var(--accent) / 0.5)',
+                          stroke: 'hsl(var(--accent))',
                           strokeWidth: 1.5,
                           outline: 'none',
                         },
@@ -134,7 +134,7 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
               >
                 <circle
                   r={4}
-                  fill="hsl(var(--coral))"
+                  fill="hsl(var(--accent))"
                   stroke="hsl(var(--background))"
                   strokeWidth={1.5}
                   style={{
@@ -145,7 +145,7 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
                 />
                 <circle
                   r={8}
-                  fill="hsl(var(--coral) / 0.3)"
+                  fill="hsl(var(--accent) / 0.3)"
                   className="animate-ping"
                   style={{ animationDuration: '3s' }}
                 />
