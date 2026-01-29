@@ -7,6 +7,8 @@ import { CategoryFilter } from '@/components/CategoryFilter';
 import { GeographicFilter, type GeographicFilters } from '@/components/GeographicFilter';
 import { CompanyGrid } from '@/components/CompanyGrid';
 import { CompanyModal } from '@/components/CompanyModal';
+import { FeaturedCompanies } from '@/components/FeaturedCompanies';
+import { DatabaseStats } from '@/components/DatabaseStats';
 import { useCompanies } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -64,6 +66,9 @@ const Index = () => {
     setTimeout(() => setSelectedCompany(null), 200);
   };
 
+  // Check if any filters are active
+  const hasActiveFilters = searchQuery || selectedCategory !== 'all' || geoFilters.continent || geoFilters.country || geoFilters.state;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -73,6 +78,16 @@ const Index = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
+
+        {/* Database Stats - shows freshness and verification info */}
+        <div className="container mx-auto px-4 -mt-6 mb-6 relative z-10">
+          <DatabaseStats />
+        </div>
+
+        {/* Featured Companies - only show when no filters active */}
+        {!hasActiveFilters && (
+          <FeaturedCompanies onCompanyClick={handleCompanyClick} />
+        )}
         
         <CategoryFilter
           selectedCategory={selectedCategory}

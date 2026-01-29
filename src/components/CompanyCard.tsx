@@ -4,7 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
+import { CompletenessIndicator } from './CompletenessIndicator';
 import { formatDistanceToNow } from 'date-fns';
+
 interface CompanyCardProps {
   company: Company;
   onClick: () => void;
@@ -41,12 +43,15 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               )}
             </div>
             
-            <Badge 
-              variant="secondary"
-              className={`mt-2 ${categoryColors[company.category]}`}
-            >
-              {categoryLabels[company.category]}
-            </Badge>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge 
+                variant="secondary"
+                className={categoryColors[company.category]}
+              >
+                {categoryLabels[company.category]}
+              </Badge>
+              <CompletenessIndicator company={company} />
+            </div>
           </div>
           
           {company.website_url && (
