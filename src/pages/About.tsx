@@ -66,7 +66,7 @@ export default function About() {
               </div>
               <div className="p-6 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
                 <Sparkles className="h-10 w-10 text-amber-500 mb-4" />
-                <h3 className="font-semibold text-lg mb-2">13 Categories</h3>
+                <h3 className="font-semibold text-lg mb-2">24 Categories</h3>
                 <p className="text-sm text-muted-foreground">Covering every aspect of women's health</p>
               </div>
               <div className="p-6 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
