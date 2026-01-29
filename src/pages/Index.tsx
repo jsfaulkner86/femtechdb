@@ -84,15 +84,15 @@ const Index = () => {
           <DatabaseStats />
         </div>
 
-        {/* Featured Companies - only show when no filters active */}
-        {!hasActiveFilters && (
-          <FeaturedCompanies onCompanyClick={handleCompanyClick} />
-        )}
-        
         <CategoryFilter
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
         />
+
+        {/* Featured Companies - only show when no filters active */}
+        {!hasActiveFilters && (
+          <FeaturedCompanies onCompanyClick={handleCompanyClick} />
+        )}
 
         <GeographicFilter
           filters={geoFilters}
