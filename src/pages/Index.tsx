@@ -89,15 +89,15 @@ const Index = () => {
           onCategoryChange={setSelectedCategory}
         />
 
-        {/* Featured Companies - only show when no filters active */}
-        {!hasActiveFilters && (
-          <FeaturedCompanies onCompanyClick={handleCompanyClick} />
-        )}
-
         <GeographicFilter
           filters={geoFilters}
           onFiltersChange={handleGeoFiltersChange}
         />
+
+        {/* Featured Companies - only show when no filters active */}
+        {!hasActiveFilters && (
+          <FeaturedCompanies onCompanyClick={handleCompanyClick} />
+        )}
         
         <CompanyGrid
           companies={companies}
