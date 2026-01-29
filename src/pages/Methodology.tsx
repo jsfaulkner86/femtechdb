@@ -157,22 +157,32 @@ export default function Methodology() {
             </div>
             
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              Companies are categorized based on their primary area of focus. Our 14 categories cover the full spectrum of women's health:
+              Companies are categorized based on their primary area of focus. Our 24 categories cover the full spectrum of women's health:
             </p>
             
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
                 { name: 'Fertility', desc: 'Conception, IVF support, egg freezing, fertility tracking' },
                 { name: 'Pregnancy', desc: 'Prenatal care, pregnancy monitoring, birth preparation' },
-                { name: 'Postpartum', desc: 'Recovery, breastfeeding support, pelvic floor health' },
+                { name: 'Postpartum', desc: 'Recovery, breastfeeding support, newborn care' },
                 { name: 'Menstrual Health', desc: 'Period tracking, menstrual products, cycle education' },
                 { name: 'Menopause', desc: 'Symptom management, hormone therapy, menopause support' },
                 { name: 'Sexual Health', desc: 'Intimacy, sexual wellness, contraception' },
                 { name: 'Mental Health', desc: 'Maternal mental health, therapy, stress management' },
                 { name: 'General Wellness', desc: 'Holistic health, nutrition, fitness for women' },
-                { name: 'Chronic Conditions', desc: 'Endometriosis, PCOS, autoimmune conditions' },
+                { name: 'Chronic Conditions', desc: 'PCOS, autoimmune conditions, long-term care' },
                 { name: 'Diagnostics', desc: 'At-home testing, screening, biomarker analysis' },
                 { name: 'Telehealth', desc: 'Virtual care, remote consultations, digital clinics' },
+                { name: 'Reproductive Health', desc: 'Comprehensive reproductive care and services' },
+                { name: 'Maternal Health', desc: 'Maternal care throughout pregnancy journey' },
+                { name: 'Hormonal Health', desc: 'Hormone balance, testing, and treatments' },
+                { name: 'Gynecological Health', desc: 'Gynecological care and conditions' },
+                { name: 'Endometriosis', desc: 'Endometriosis diagnosis, treatment, and support' },
+                { name: 'Heart Disease', desc: 'Women\'s cardiovascular health and prevention' },
+                { name: 'Pelvic Health', desc: 'Pelvic floor therapy and related conditions' },
+                { name: 'Bone Health', desc: 'Osteoporosis prevention and bone wellness' },
+                { name: 'Cancer', desc: 'Women\'s cancer detection, treatment, and support' },
+                { name: 'Mobile Apps', desc: 'Health apps from App Store and Google Play' },
                 { name: 'Precision Medicine & AI', desc: 'Personalized treatments, AI diagnostics, genomics' },
                 { name: 'Investors & Funds', desc: 'VCs and funds focused on femtech investments' },
                 { name: 'Resources & Community', desc: 'Educational platforms, advocacy, support networks' },
