@@ -71,3 +71,21 @@ export function useCompany(id: string) {
     enabled: !!id,
   });
 }
+
+export function useCompanyCount() {
+  return useQuery({
+    queryKey: ['companies-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('companies')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) {
+        throw error;
+      }
+
+      return count ?? 0;
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+}
