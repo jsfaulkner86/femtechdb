@@ -1,7 +1,6 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Heart, Target, Users, Sparkles, Globe, TrendingUp, Lightbulb } from 'lucide-react';
-import { SubmitCompanyForm } from '@/components/SubmitCompanyForm';
 
 export default function About() {
   return (
@@ -179,21 +178,6 @@ export default function About() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-gradient-hero">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
-              Have a Company to Add?
-            </h2>
-            <p className="text-primary-foreground/80 text-lg mb-8">
-              Know a femtech company that should be in our directory? We'd love to hear about it. Our AI-powered system reviews and adds new companies daily.
-            </p>
-            <SubmitCompanyForm />
           </div>
         </div>
       </section>

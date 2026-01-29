@@ -1,6 +1,5 @@
 import { Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SubmitCompanyForm } from './SubmitCompanyForm';
 
 export function Footer() {
   return (
@@ -16,14 +15,11 @@ export function Footer() {
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-              <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
-              <Link to="/methodology" className="hover:text-foreground transition-colors">Methodology</Link>
-              <Link to="/global-map" className="hover:text-foreground transition-colors">Global Map</Link>
-            </nav>
-            <SubmitCompanyForm />
-          </div>
+          <nav className="flex items-center gap-4 text-sm text-muted-foreground">
+            <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+            <Link to="/methodology" className="hover:text-foreground transition-colors">Methodology</Link>
+            <Link to="/global-map" className="hover:text-foreground transition-colors">Global Map</Link>
+          </nav>
 
           <div className="flex flex-col items-center md:items-end gap-2">
             <nav className="flex items-center gap-3 text-xs text-muted-foreground">
