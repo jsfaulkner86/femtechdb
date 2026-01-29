@@ -201,21 +201,16 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
                 onMouseLeave={handleMarkerLeave}
               >
                 <circle
-                  r={4 / position.zoom}
+                  r={5 / position.zoom}
                   fill="hsl(var(--accent))"
                   stroke="hsl(var(--background))"
                   strokeWidth={1.5 / position.zoom}
                   style={{
                     cursor: 'pointer',
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                    filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))',
+                    transition: 'all 0.2s ease',
                   }}
-                  className="transition-all duration-200"
-                />
-                <circle
-                  r={8 / position.zoom}
-                  fill="hsl(var(--accent) / 0.3)"
-                  className="animate-ping"
-                  style={{ animationDuration: '3s' }}
+                  className="hover:opacity-80"
                 />
               </Marker>
             ))}
