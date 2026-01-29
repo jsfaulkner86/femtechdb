@@ -22,7 +22,38 @@ export type FemtechCategory =
   | 'pelvic_health'
   | 'bone_health'
   | 'cancer'
+  | 'mobile_apps'
   | 'other';
+
+export type Continent = 
+  | 'Africa'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'South America'
+  | 'Oceania';
+
+export const continents: Continent[] = [
+  'Africa',
+  'Asia',
+  'Europe',
+  'North America',
+  'South America',
+  'Oceania',
+];
+
+export const usStates = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+  'Wisconsin', 'Wyoming'
+] as const;
+
+export type USState = typeof usStates[number];
 
 export interface Company {
   id: string;
@@ -35,6 +66,9 @@ export interface Company {
   logo_url: string | null;
   founded_year: number | null;
   headquarters: string | null;
+  continent: string | null;
+  country: string | null;
+  state: string | null;
   is_verified: boolean;
   source_url: string | null;
   created_at: string;
@@ -65,6 +99,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   pelvic_health: 'Pelvic Health',
   bone_health: 'Bone Health',
   cancer: 'Cancer',
+  mobile_apps: 'Mobile Apps',
   other: 'Other',
 };
 
@@ -92,5 +127,6 @@ export const categoryColors: Record<FemtechCategory, string> = {
   pelvic_health: 'bg-teal text-primary-foreground',
   bone_health: 'bg-muted text-foreground',
   cancer: 'bg-secondary text-secondary-foreground',
+  mobile_apps: 'bg-primary text-primary-foreground',
   other: 'bg-muted text-muted-foreground',
 };

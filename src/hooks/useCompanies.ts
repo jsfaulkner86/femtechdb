@@ -5,11 +5,14 @@ import type { Company, FemtechCategory } from '@/types/company';
 interface UseCompaniesOptions {
   search?: string;
   category?: FemtechCategory | 'all';
+  continent?: string | null;
+  country?: string | null;
+  state?: string | null;
 }
 
-export function useCompanies({ search, category }: UseCompaniesOptions = {}) {
+export function useCompanies({ search, category, continent, country, state }: UseCompaniesOptions = {}) {
   return useQuery({
-    queryKey: ['companies', search, category],
+    queryKey: ['companies', search, category, continent, country, state],
     queryFn: async () => {
       let query = supabase
         .from('companies')
@@ -24,6 +27,18 @@ export function useCompanies({ search, category }: UseCompaniesOptions = {}) {
 
       if (category && category !== 'all') {
         query = query.eq('category', category);
+      }
+
+      if (continent) {
+        query = query.eq('continent', continent);
+      }
+
+      if (country) {
+        query = query.eq('country', country);
+      }
+
+      if (state) {
+        query = query.eq('state', state);
       }
 
       const { data, error } = await query;

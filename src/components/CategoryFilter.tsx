@@ -22,7 +22,8 @@ import {
   ShieldPlus,
   Droplets,
   CircleDot,
-  Waves
+  Waves,
+  Smartphone
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
@@ -49,6 +50,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   pelvic_health: Waves,
   bone_health: Bone,
   cancer: Ribbon,
+  mobile_apps: Smartphone,
   other: MoreHorizontal,
 };
 
@@ -78,6 +80,7 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   pelvic_health: 'text-blue-400',
   bone_health: 'text-gray-500',
   cancer: 'text-pink-600',
+  mobile_apps: 'text-sky-500',
   other: 'text-gray-500',
 };
 
@@ -110,6 +113,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
     'diagnostics',
     'telehealth',
     'precision_medicine_ai',
+    'mobile_apps',
     'investors',
     'resources_community',
   ];

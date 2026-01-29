@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { HeroSection } from '@/components/HeroSection';
 import { CategoryFilter } from '@/components/CategoryFilter';
+import { GeographicFilter, type GeographicFilters } from '@/components/GeographicFilter';
 import { CompanyGrid } from '@/components/CompanyGrid';
 import { CompanyModal } from '@/components/CompanyModal';
 import { useCompanies } from '@/hooks/useCompanies';
@@ -14,12 +15,20 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<FemtechCategory | 'all'>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [geoFilters, setGeoFilters] = useState<GeographicFilters>({
+    continent: null,
+    country: null,
+    state: null,
+  });
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   const { data: companies, isLoading } = useCompanies({
     search: debouncedSearch,
     category: selectedCategory,
+    continent: geoFilters.continent,
+    country: geoFilters.country,
+    state: geoFilters.state,
   });
 
   const handleCompanyClick = (company: Company) => {
@@ -45,6 +54,11 @@ const Index = () => {
         <CategoryFilter
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+        />
+
+        <GeographicFilter
+          filters={geoFilters}
+          onFiltersChange={setGeoFilters}
         />
         
         <CompanyGrid
