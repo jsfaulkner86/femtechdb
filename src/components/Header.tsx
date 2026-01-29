@@ -16,7 +16,7 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-6">
           <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Browse
+            Directory
           </Link>
           <Link to="/global-map" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
             <Globe className="h-3.5 w-3.5" />
