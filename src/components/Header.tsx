@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react';
+import { Heart, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Header() {
@@ -17,6 +17,10 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-6">
           <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Browse
+          </Link>
+          <Link to="/global-map" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+            <Globe className="h-3.5 w-3.5" />
+            Global Map
           </Link>
           <a href="/#categories" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Categories

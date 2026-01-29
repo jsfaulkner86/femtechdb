@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { HeroSection } from '@/components/HeroSection';
@@ -11,15 +12,37 @@ import { Company, FemtechCategory } from '@/types/company';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<FemtechCategory | 'all'>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [geoFilters, setGeoFilters] = useState<GeographicFilters>({
-    continent: null,
-    country: null,
-    state: null,
+    continent: searchParams.get('continent'),
+    country: searchParams.get('country'),
+    state: searchParams.get('state'),
   });
+
+  // Sync URL params with geo filters on mount and when URL changes
+  useEffect(() => {
+    const continent = searchParams.get('continent');
+    const country = searchParams.get('country');
+    const state = searchParams.get('state');
+    
+    if (continent || country || state) {
+      setGeoFilters({ continent, country, state });
+    }
+  }, [searchParams]);
+
+  // Update URL when geo filters change
+  const handleGeoFiltersChange = (filters: GeographicFilters) => {
+    setGeoFilters(filters);
+    const params = new URLSearchParams();
+    if (filters.continent) params.set('continent', filters.continent);
+    if (filters.country) params.set('country', filters.country);
+    if (filters.state) params.set('state', filters.state);
+    setSearchParams(params, { replace: true });
+  };
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
@@ -58,7 +81,7 @@ const Index = () => {
 
         <GeographicFilter
           filters={geoFilters}
-          onFiltersChange={setGeoFilters}
+          onFiltersChange={handleGeoFiltersChange}
         />
         
         <CompanyGrid
