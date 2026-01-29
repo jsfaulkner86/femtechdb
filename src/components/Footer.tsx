@@ -20,13 +20,21 @@ export function Footer() {
             <nav className="flex items-center gap-4 text-sm text-muted-foreground">
               <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
               <Link to="/methodology" className="hover:text-foreground transition-colors">Methodology</Link>
+              <Link to="/global-map" className="hover:text-foreground transition-colors">Global Map</Link>
             </nav>
             <SubmitCompanyForm />
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            Updated daily • {new Date().getFullYear()}
-          </p>
+          <div className="flex flex-col items-center md:items-end gap-2">
+            <nav className="flex items-center gap-3 text-xs text-muted-foreground">
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            </nav>
+            <p className="text-xs text-muted-foreground">
+              Updated daily • {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
