@@ -17,6 +17,8 @@ export type Database = {
       companies: {
         Row: {
           category: Database["public"]["Enums"]["femtech_category"]
+          continent: string | null
+          country: string | null
           created_at: string
           founded_year: number | null
           headquarters: string | null
@@ -28,11 +30,14 @@ export type Database = {
           problem: string | null
           solution: string | null
           source_url: string | null
+          state: string | null
           updated_at: string
           website_url: string | null
         }
         Insert: {
           category?: Database["public"]["Enums"]["femtech_category"]
+          continent?: string | null
+          country?: string | null
           created_at?: string
           founded_year?: number | null
           headquarters?: string | null
@@ -44,11 +49,14 @@ export type Database = {
           problem?: string | null
           solution?: string | null
           source_url?: string | null
+          state?: string | null
           updated_at?: string
           website_url?: string | null
         }
         Update: {
           category?: Database["public"]["Enums"]["femtech_category"]
+          continent?: string | null
+          country?: string | null
           created_at?: string
           founded_year?: number | null
           headquarters?: string | null
@@ -60,6 +68,7 @@ export type Database = {
           problem?: string | null
           solution?: string | null
           source_url?: string | null
+          state?: string | null
           updated_at?: string
           website_url?: string | null
         }
@@ -165,6 +174,7 @@ export type Database = {
         | "pelvic_health"
         | "bone_health"
         | "cancer"
+        | "mobile_apps"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -318,6 +328,7 @@ export const Constants = {
         "pelvic_health",
         "bone_health",
         "cancer",
+        "mobile_apps",
       ],
     },
   },

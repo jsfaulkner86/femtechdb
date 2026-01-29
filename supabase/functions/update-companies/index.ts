@@ -15,6 +15,9 @@ interface CompanyData {
   website_url: string;
   founded_year: number | null;
   headquarters: string;
+  continent: string | null;
+  country: string | null;
+  state: string | null;
 }
 
 const FEMTECH_CATEGORIES = [
@@ -41,6 +44,7 @@ const FEMTECH_CATEGORIES = [
   'pelvic_health',
   'bone_health',
   'cancer',
+  'mobile_apps',
   'other'
 ];
 
@@ -149,6 +153,7 @@ SEARCH ACROSS ALL THESE CATEGORIES:
 21. Pelvic Health (pelvic floor disorders, prolapse, incontinence)
 22. Bone Health (osteoporosis, bone density, calcium metabolism)
 23. Cancer (breast cancer, ovarian cancer, cervical cancer, women's oncology)
+24. Mobile Apps (femtech apps from Apple App Store and Google Play Store - period trackers, fertility apps, pregnancy apps, menopause apps)
 
 RESEARCH SOURCES TO CONSIDER:
 - Femtech Insider, FemTech World, Rock Health reports
@@ -156,6 +161,7 @@ RESEARCH SOURCES TO CONSIDER:
 - Y Combinator, Techstars, and other accelerator portfolios
 - LinkedIn company pages and industry groups
 - Academic spin-offs and research commercialization
+- Apple App Store and Google Play Store top health apps
 
 For each company, provide information in this exact JSON format:
 {
@@ -165,10 +171,13 @@ For each company, provide information in this exact JSON format:
       "mission": "Their mission statement or purpose",
       "problem": "The specific women's health problem they address",
       "solution": "How their product/service solves this problem",
-      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, reproductive_health, maternal_health, hormonal_health, gynecological_health, endometriosis, heart_disease, pelvic_health, bone_health, cancer, other",
+      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, reproductive_health, maternal_health, hormonal_health, gynecological_health, endometriosis, heart_disease, pelvic_health, bone_health, cancer, mobile_apps, other",
       "website_url": "https://their-website.com",
       "founded_year": 2022,
-      "headquarters": "City, Country"
+      "headquarters": "City, Country",
+      "continent": "North America, Europe, Asia, Africa, South America, or Oceania",
+      "country": "Country name",
+      "state": "State name (only if in United States, otherwise null)"
     }
   ]
 }
@@ -180,6 +189,8 @@ IMPORTANT:
 - The category must be exactly one of the listed options
 - founded_year should be a number or null if unknown
 - Provide accurate, verifiable information
+- Include geographic information (continent, country, state for US companies)
+- For mobile_apps category, include popular femtech apps from app stores
 - Prioritize lesser-known companies over well-funded unicorns`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -260,6 +271,9 @@ IMPORTANT:
           website_url: c.website_url,
           founded_year: c.founded_year,
           headquarters: c.headquarters,
+          continent: c.continent,
+          country: c.country,
+          state: c.state,
           is_verified: false,
         })))
         .select();
