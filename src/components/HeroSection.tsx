@@ -55,7 +55,7 @@ export function HeroSection({
           animationDelay: '0.4s'
         }}>
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">810+</span>
+              <span className="block text-2xl font-bold text-foreground">840+</span>
               <span className="text-muted-foreground">Companies</span>
             </div>
             <div className="h-8 w-px bg-border" />
