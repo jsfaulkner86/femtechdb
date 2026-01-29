@@ -12,7 +12,7 @@ export function Footer() {
               <Heart className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground">
-              FemTech<span className="text-primary">DB</span>
+              Femtech<span className="text-primary">DB</span>
             </span>
           </div>
 
