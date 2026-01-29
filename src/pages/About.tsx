@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Heart, Target, Users, Sparkles, Globe, TrendingUp, Mail, Lightbulb } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Heart, Target, Users, Sparkles, Globe, TrendingUp, Lightbulb } from 'lucide-react';
+import { SubmitCompanyForm } from '@/components/SubmitCompanyForm';
 
 export default function About() {
   return (
@@ -193,10 +193,7 @@ export default function About() {
             <p className="text-primary-foreground/80 text-lg mb-8">
               Know a femtech company that should be in our directory? We'd love to hear about it. Our AI-powered system reviews and adds new companies daily.
             </p>
-            <Button size="lg" variant="secondary" className="rounded-full px-8">
-              <Mail className="mr-2 h-5 w-5" />
-              Suggest a Company
-            </Button>
+            <SubmitCompanyForm />
           </div>
         </div>
       </section>
