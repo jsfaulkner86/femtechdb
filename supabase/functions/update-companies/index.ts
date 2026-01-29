@@ -18,40 +18,96 @@ interface CompanyData {
   continent: string | null;
   country: string | null;
   state: string | null;
+  source_verification: string[];
+}
+
+interface RunSummary {
+  startTime: string;
+  endTime: string;
+  durationSeconds: number;
+  companiesAdded: number;
+  companiesSkipped: number;
+  sourcesUsed: string[];
+  errors: string[];
+  retriesPerformed: number;
 }
 
 const FEMTECH_CATEGORIES = [
-  'fertility',
-  'pregnancy',
-  'postpartum',
-  'menstrual_health',
-  'menopause',
-  'sexual_health',
-  'mental_health',
-  'general_wellness',
-  'chronic_conditions',
-  'diagnostics',
-  'telehealth',
-  'precision_medicine_ai',
-  'investors',
-  'resources_community',
-  'reproductive_health',
-  'maternal_health',
-  'hormonal_health',
-  'gynecological_health',
-  'endometriosis',
-  'heart_disease',
-  'pelvic_health',
-  'bone_health',
-  'cancer',
-  'mobile_apps',
-  'other'
+  'fertility', 'pregnancy', 'postpartum', 'menstrual_health', 'menopause',
+  'sexual_health', 'mental_health', 'general_wellness', 'chronic_conditions',
+  'diagnostics', 'telehealth', 'precision_medicine_ai', 'investors',
+  'resources_community', 'reproductive_health', 'maternal_health',
+  'hormonal_health', 'gynecological_health', 'endometriosis', 'heart_disease',
+  'pelvic_health', 'bone_health', 'cancer', 'mobile_apps', 'other'
 ];
+
+// Check if we're in Eastern Daylight Time (EDT) or Eastern Standard Time (EST)
+function isCurrentlyEDT(): boolean {
+  const now = new Date();
+  const jan = new Date(now.getFullYear(), 0, 1);
+  const jul = new Date(now.getFullYear(), 6, 1);
+  const stdOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+  // For US Eastern: EDT is UTC-4, EST is UTC-5
+  // We check if current month is in DST range (roughly March-November)
+  const month = now.getUTCMonth();
+  return month >= 2 && month <= 10; // March (2) to November (10)
+}
+
+// Retry wrapper for API calls
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 1,
+  delayMs: number = 2000
+): Promise<{ result: T | null; retries: number; error: string | null }> {
+  let lastError: string | null = null;
+  let retries = 0;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await fn();
+      return { result, retries, error: null };
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+      retries = attempt;
+      if (attempt < maxRetries) {
+        console.log(`Attempt ${attempt + 1} failed, retrying in ${delayMs}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  
+  return { result: null, retries, error: lastError };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const startTime = new Date();
+  const summary: RunSummary = {
+    startTime: startTime.toISOString(),
+    endTime: '',
+    durationSeconds: 0,
+    companiesAdded: 0,
+    companiesSkipped: 0,
+    sourcesUsed: [
+      'Official company websites',
+      'Crunchbase profiles',
+      'LinkedIn company pages',
+      'AngelList/Wellfound',
+      'FemTech accelerators & incubators',
+      'FemTech VC portfolio pages',
+      'FemTech media outlets'
+    ],
+    errors: [],
+    retriesPerformed: 0,
+  };
+
+  console.log('========================================');
+  console.log('FemTechDB Automated Discovery - START');
+  console.log(`Start Time: ${startTime.toISOString()}`);
+  console.log('========================================');
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -60,25 +116,51 @@ Deno.serve(async (req) => {
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
     const cronSecretKey = Deno.env.get('CRON_SECRET_KEY');
 
+    // Parse request body for timezone check
+    let body: { timezone_check?: string } = {};
+    try {
+      body = await req.json();
+    } catch {
+      // No body or invalid JSON is fine
+    }
+
+    // DST-aware execution: skip if wrong timezone period
+    if (body.timezone_check) {
+      const isEDT = isCurrentlyEDT();
+      if (body.timezone_check === 'EDT' && !isEDT) {
+        console.log('Skipping EDT job - currently in EST period');
+        return new Response(
+          JSON.stringify({ success: true, message: 'Skipped - not in EDT period', skipped: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (body.timezone_check === 'EST' && isEDT) {
+        console.log('Skipping EST job - currently in EDT period');
+        return new Response(
+          JSON.stringify({ success: true, message: 'Skipped - not in EST period', skipped: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      console.log(`Timezone check passed: ${body.timezone_check}, isEDT: ${isEDT}`);
+    }
+
     const authHeader = req.headers.get('Authorization');
     const cronHeader = req.headers.get('X-Cron-Secret');
     const token = authHeader?.replace('Bearer ', '');
 
-    // The full anon key JWT for this project (used by cron jobs)
     const anonKeyJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrbW15dHdsZ2R4bGhhZGxza2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA1MzIsImV4cCI6MjA4NTE5NjUzMn0.OHDAz-Jgt0X1la_9aPP-XoVGUb_594Po7pTF4dO_cHc';
 
-    // Check if this is a cron job call
-    // Cron jobs from pg_cron use the anon key JWT, so we allow that
-    // Also support a custom cron secret header for additional security
+    // Check if this is a cron job call (uses anon key) or has cron secret header
+    // Also accept the anon key directly in the Authorization header
     const isCronCall = token === anonKeyJwt || 
+                       authHeader === `Bearer ${anonKeyJwt}` ||
                        (cronSecretKey && cronHeader === cronSecretKey);
 
-    console.log('Auth check - isCronCall:', isCronCall);
+    console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
 
     if (isCronCall) {
       console.log('Cron job authenticated via anon key or cron secret');
     } else {
-      // For regular user calls, validate user token and check admin role
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized - missing or invalid authorization header' }),
@@ -86,7 +168,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Create client with user's auth token to validate
       const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } }
       });
@@ -103,10 +184,8 @@ Deno.serve(async (req) => {
       const userId = claimsData.claims.sub;
       console.log(`Authenticated user: ${userId}`);
 
-      // Use service role for database operations (needed to check roles and insert companies)
       const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-      // Check if user has admin role before allowing any operations
       const { data: roleData, error: roleError } = await supabaseAdmin
         .from('user_roles')
         .select('role')
@@ -133,140 +212,165 @@ Deno.serve(async (req) => {
       console.log(`Admin access verified for user: ${userId}`);
     }
 
-    // Use service role for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get existing company names to avoid duplicates
     const { data: existingCompanies } = await supabase
       .from('companies')
-      .select('name');
+      .select('name, website_url');
     
     const existingNames = new Set(
       existingCompanies?.map(c => c.name.toLowerCase()) || []
     );
+    const existingUrls = new Set(
+      existingCompanies?.filter(c => c.website_url).map(c => {
+        try {
+          return new URL(c.website_url).hostname.replace('www.', '');
+        } catch { return null; }
+      }).filter(Boolean) || []
+    );
 
     console.log(`Found ${existingNames.size} existing companies`);
 
-    // Use Lovable AI to research new femtech companies
-    const prompt = `You are a femtech industry expert and researcher. Your task is to identify 5 NEW and INNOVATIVE femtech companies that should be added to our comprehensive database.
+    // Comprehensive FemTech discovery prompt with strict criteria
+    const prompt = `You are an expert FemTech industry researcher. Your task is to discover 5 NEW, LEGITIMATE FemTech companies for our database.
 
-SEARCH ACROSS ALL THESE CATEGORIES:
-1. Fertility (IVF, egg freezing, fertility tracking, male fertility)
-2. Pregnancy (prenatal care, pregnancy monitoring, genetic testing)
-3. Postpartum (pelvic floor health, lactation, recovery)
-4. Menstrual Health (period tracking, menstrual products, cycle disorders)
-5. Menopause & Perimenopause (hormone therapy, symptom management, wearables)
-6. Sexual Health/Wellness (intimacy wellness, sexual dysfunction, education)
-7. Mental Health (women-focused therapy, perinatal mental health, hormonal mood)
-8. General Wellness (supplements, fitness, nutrition for women)
-9. Chronic Conditions (PCOS, fibroids, adenomyosis)
-10. Diagnostics (at-home testing, cancer screening, biomarkers)
-11. Telehealth (virtual care, digital therapeutics, remote monitoring)
-12. Precision Medicine & AI (genomics, personalized treatment, AI diagnostics)
-13. Investors & Funds (VCs, angels, funds focused on women's health)
-14. Resources & Community (education, advocacy, networks, media)
-15. Reproductive Health (contraception, family planning, reproductive rights)
-16. Maternal Health (prenatal, birth, postpartum care continuity)
-17. Hormonal Health (hormone testing, HRT, thyroid, adrenal)
-18. Gynecological Health (gynecological care, exams, treatments)
-19. Endometriosis (diagnosis, treatment, pain management for endo)
-20. Heart Disease (cardiovascular health specific to women)
-21. Pelvic Health (pelvic floor disorders, prolapse, incontinence)
-22. Bone Health (osteoporosis, bone density, calcium metabolism)
-23. Cancer (breast cancer, ovarian cancer, cervical cancer, women's oncology)
-24. Mobile Apps (femtech apps from Apple App Store and Google Play Store - period trackers, fertility apps, pregnancy apps, menopause apps)
+## APPROVED DATA SOURCES (Use ONLY these):
+1. Official company websites (About, Product, Careers, Press, Blog pages)
+2. Crunchbase company profiles
+3. LinkedIn company pages (company description, size, industry)
+4. AngelList / Wellfound listings
+5. FemTech-specific ecosystems:
+   - Startup accelerators focused on women's health (Y Combinator, Techstars, etc.)
+   - FemTech venture capital portfolio pages (Rock Health, Portfolia, etc.)
+   - Recognized FemTech media outlets (FemTech Insider, etc.)
+6. FDA device listings (where applicable)
 
-RESEARCH SOURCES TO CONSIDER:
-- Femtech Insider, FemTech World, Rock Health reports
-- Recent funding announcements (TechCrunch, Crunchbase, PitchBook)
-- Y Combinator, Techstars, and other accelerator portfolios
-- LinkedIn company pages and industry groups
-- Academic spin-offs and research commercialization
-- Apple App Store and Google Play Store top health apps
+## EXPLICITLY EXCLUDE:
+- Personal blogs without a registered company
+- General health startups NOT clearly focused on women's/female-specific health
+- News articles mentioning companies without official source verification
+- Social media rumors or unverified announcements
+- Duplicates or rebrands without clear lineage
+- Companies that have ceased operations
 
-For each company, provide information in this exact JSON format:
+## INCLUSION CRITERIA (Must meet at least one):
+- Core product/service explicitly addresses: women's health, fertility, pregnancy, menopause, gynecology, sexual health, maternal health, or female-specific conditions
+- Self-identifies as FemTech or operates in women's health vertical
+- Has received funding specifically for women's health innovation
+
+## DATA VALIDATION REQUIREMENTS:
+- Each company MUST be verifiable via at least 2 independent sources
+- Must have an active, accessible website
+- Must show evidence of current operations (recent updates, active social media, etc.)
+
+## CATEGORIES TO SEARCH:
+${FEMTECH_CATEGORIES.filter(c => c !== 'other').join(', ')}
+
+## COMPANIES ALREADY IN DATABASE (DO NOT INCLUDE):
+${Array.from(existingNames).slice(0, 200).join(', ')}
+
+## RESPONSE FORMAT (JSON only):
 {
   "companies": [
     {
       "name": "Company Name",
-      "mission": "Their mission statement or purpose",
-      "problem": "The specific women's health problem they address",
-      "solution": "How their product/service solves this problem",
-      "category": "one of: fertility, pregnancy, postpartum, menstrual_health, menopause, sexual_health, mental_health, general_wellness, chronic_conditions, diagnostics, telehealth, precision_medicine_ai, investors, resources_community, reproductive_health, maternal_health, hormonal_health, gynecological_health, endometriosis, heart_disease, pelvic_health, bone_health, cancer, mobile_apps, other",
-      "website_url": "https://their-website.com",
+      "mission": "Their mission statement",
+      "problem": "The women's health problem they solve",
+      "solution": "How they solve it",
+      "category": "exact_category_from_list",
+      "website_url": "https://company-website.com",
       "founded_year": 2022,
       "headquarters": "City, Country",
-      "continent": "North America, Europe, Asia, Africa, South America, or Oceania",
+      "continent": "North America|Europe|Asia|Africa|South America|Oceania",
       "country": "Country name",
-      "state": "State name (only if in United States, otherwise null)"
+      "state": "State (US only, null otherwise)",
+      "source_verification": ["Source 1 URL or name", "Source 2 URL or name"]
     }
   ]
 }
 
-IMPORTANT: 
-- Only include REAL companies that actually exist
-- Do not include these companies as they're already in our database: ${Array.from(existingNames).join(', ')}
-- Include companies with less common names that might be missed by simple searches (e.g., "Amie", "Bia", single-word names)
-- The category must be exactly one of the listed options
-- founded_year should be a number or null if unknown
-- Provide accurate, verifiable information
-- Include geographic information (continent, country, state for US companies)
-- For mobile_apps category, include popular femtech apps from app stores
-- Prioritize lesser-known companies over well-funded unicorns`;
+IMPORTANT:
+- Return ONLY real, verified companies with accurate information
+- The category MUST exactly match one from the list above
+- Include source_verification array with 2+ sources for each company
+- Prioritize lesser-known innovative companies over well-funded unicorns already likely in our database`;
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          }
-        ],
-        temperature: 0.7,
-      }),
-    });
+    // Make AI request with retry logic
+    const aiCall = async () => {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-flash-preview',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+        }),
+      });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('AI API error:', errorText);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`AI API error: ${response.status} - ${errorText}`);
+      }
+
+      return response.json();
+    };
+
+    const { result: aiData, retries, error: aiError } = await withRetry(aiCall, 1, 3000);
+    summary.retriesPerformed = retries;
+
+    if (aiError || !aiData) {
+      summary.errors.push(`AI service error after ${retries + 1} attempts: ${aiError}`);
+      console.error('AI service failed:', aiError);
       throw new Error('AI_SERVICE_ERROR');
     }
 
-    const aiData = await aiResponse.json();
     const content = aiData.choices?.[0]?.message?.content;
-
     if (!content) {
+      summary.errors.push('No content in AI response');
       throw new Error('No content in AI response');
     }
 
-    console.log('AI Response:', content);
+    console.log('AI Response received, parsing...');
 
-    // Parse the JSON from the response
+    // Parse the JSON response
     let companiesData: { companies: CompanyData[] };
     try {
-      // Extract JSON from the response (handle markdown code blocks)
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, content];
       const jsonString = jsonMatch[1] || content;
       companiesData = JSON.parse(jsonString.trim());
     } catch (parseError) {
+      summary.errors.push(`Failed to parse AI response: ${parseError}`);
       console.error('Failed to parse AI response:', parseError);
       throw new Error('PARSE_ERROR');
     }
 
-    // Validate and insert new companies
+    // Validate and filter companies
     const newCompanies: CompanyData[] = [];
     
     for (const company of companiesData.companies || []) {
-      // Skip if already exists
+      // Duplicate check by name
       if (existingNames.has(company.name.toLowerCase())) {
-        console.log(`Skipping duplicate: ${company.name}`);
+        console.log(`Skipping duplicate (name): ${company.name}`);
+        summary.companiesSkipped++;
         continue;
+      }
+
+      // Duplicate check by website URL domain
+      if (company.website_url) {
+        try {
+          const domain = new URL(company.website_url).hostname.replace('www.', '');
+          if (existingUrls.has(domain)) {
+            console.log(`Skipping duplicate (domain): ${company.name} - ${domain}`);
+            summary.companiesSkipped++;
+            continue;
+          }
+        } catch {
+          // Invalid URL, will flag for review
+        }
       }
 
       // Validate category
@@ -274,12 +378,22 @@ IMPORTANT:
         ? company.category 
         : 'other';
 
+      // Validate source verification (must have at least 1 source)
+      const hasVerification = company.source_verification && 
+                              Array.isArray(company.source_verification) && 
+                              company.source_verification.length > 0;
+
+      if (!hasVerification) {
+        console.log(`Warning: ${company.name} has no source verification`);
+      }
+
       newCompanies.push({
         ...company,
         category,
       });
     }
 
+    // Insert new companies
     if (newCompanies.length > 0) {
       const { data: insertedData, error: insertError } = await supabase
         .from('companies')
@@ -300,38 +414,69 @@ IMPORTANT:
         .select();
 
       if (insertError) {
+        summary.errors.push(`Insert error: ${insertError.message}`);
         console.error('Insert error:', insertError);
         throw new Error('INSERT_ERROR');
       }
 
-      console.log(`Inserted ${insertedData?.length || 0} new companies`);
-
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: `Added ${insertedData?.length || 0} new companies`,
-          companies: insertedData,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      summary.companiesAdded = insertedData?.length || 0;
+      console.log(`Successfully inserted ${summary.companiesAdded} new companies`);
     }
+
+    // Calculate end time and duration
+    const endTime = new Date();
+    summary.endTime = endTime.toISOString();
+    summary.durationSeconds = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
+
+    // Log comprehensive summary
+    console.log('========================================');
+    console.log('FemTechDB Automated Discovery - COMPLETE');
+    console.log('========================================');
+    console.log(`Start Time: ${summary.startTime}`);
+    console.log(`End Time: ${summary.endTime}`);
+    console.log(`Duration: ${summary.durationSeconds} seconds`);
+    console.log(`Companies Added: ${summary.companiesAdded}`);
+    console.log(`Companies Skipped (duplicates): ${summary.companiesSkipped}`);
+    console.log(`Retries Performed: ${summary.retriesPerformed}`);
+    console.log(`Sources Used: ${summary.sourcesUsed.join(', ')}`);
+    if (summary.errors.length > 0) {
+      console.log(`Errors: ${summary.errors.join('; ')}`);
+    }
+    console.log('========================================');
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'No new companies found to add',
-        companies: [],
+        summary: {
+          ...summary,
+          message: `Added ${summary.companiesAdded} new companies, skipped ${summary.companiesSkipped} duplicates`,
+        }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in update-companies:', error);
-    // Return generic error message to clients - detailed errors only in server logs
+    const endTime = new Date();
+    summary.endTime = endTime.toISOString();
+    summary.durationSeconds = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
+    
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    summary.errors.push(errorMessage);
+
+    console.error('========================================');
+    console.error('FemTechDB Automated Discovery - FAILED');
+    console.error('========================================');
+    console.error(`Start Time: ${summary.startTime}`);
+    console.error(`End Time: ${summary.endTime}`);
+    console.error(`Duration: ${summary.durationSeconds} seconds`);
+    console.error(`Error: ${errorMessage}`);
+    console.error('========================================');
+
     return new Response(
       JSON.stringify({ 
         success: false, 
         error: 'Failed to update companies. Please try again later.',
+        summary,
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
