@@ -1,13 +1,17 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useCompanyCount } from '@/hooks/useCompanies';
+
 interface HeroSectionProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
 }
+
 export function HeroSection({
   searchQuery,
   onSearchChange
 }: HeroSectionProps) {
+  const { data: companyCount } = useCompanyCount();
   return <section className="relative overflow-hidden bg-gradient-subtle py-20 md:py-28">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -55,7 +59,9 @@ export function HeroSection({
           animationDelay: '0.4s'
         }}>
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">844+</span>
+              <span className="block text-2xl font-bold text-foreground">
+                {companyCount !== undefined ? `${companyCount}+` : '...'}
+              </span>
               <span className="text-muted-foreground">Companies</span>
             </div>
             <div className="h-8 w-px bg-border" />
