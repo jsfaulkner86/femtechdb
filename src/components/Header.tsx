@@ -22,9 +22,6 @@ export function Header() {
             <Globe className="h-3.5 w-3.5" />
             Global Map
           </Link>
-          <a href="/#categories" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Categories
-          </a>
           <Link to="/methodology" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Methodology
           </Link>
