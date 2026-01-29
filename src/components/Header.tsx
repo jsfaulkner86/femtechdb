@@ -10,7 +10,7 @@ export function Header() {
             <Heart className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-xl font-bold text-foreground">
-            FemTech<span className="text-primary">DB</span>
+            Femtech<span className="text-primary">DB</span>
           </span>
         </Link>
 
