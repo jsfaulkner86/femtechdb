@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
 import { CompletenessIndicator } from './CompletenessIndicator';
+import { SafeLink } from './SafeLink';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CompanyCardProps {
@@ -62,9 +63,9 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               asChild
               onClick={(e) => e.stopPropagation()}
             >
-              <a href={company.website_url} target="_blank" rel="noopener noreferrer">
+              <SafeLink href={company.website_url}>
                 <ExternalLink className="h-4 w-4" />
-              </a>
+              </SafeLink>
             </Button>
           )}
         </div>

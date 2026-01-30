@@ -216,6 +216,33 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Rate limiting: Check for recent successful execution (1 hour cooldown)
+    const COOLDOWN_MINUTES = 60;
+    const { data: recentExecution } = await supabase
+      .from('function_executions')
+      .select('executed_at')
+      .eq('function_name', 'update-companies')
+      .eq('success', true)
+      .gte('executed_at', new Date(Date.now() - COOLDOWN_MINUTES * 60 * 1000).toISOString())
+      .order('executed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (recentExecution) {
+      const lastRun = new Date(recentExecution.executed_at);
+      const minutesSince = Math.round((Date.now() - lastRun.getTime()) / 60000);
+      console.log(`Rate limit hit: Last successful run was ${minutesSince} minutes ago`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'RATE_LIMITED',
+          message: `Function ran successfully ${minutesSince} minutes ago. Please wait ${COOLDOWN_MINUTES - minutesSince} more minutes.`,
+          lastExecution: recentExecution.executed_at
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Get existing company names to avoid duplicates
     const { data: existingCompanies } = await supabase
       .from('companies')
@@ -457,6 +484,14 @@ IMPORTANT:
       console.log(`Errors: ${summary.errors.join('; ')}`);
     }
     console.log('========================================');
+
+    // Log successful execution for rate limiting
+    await supabase.from('function_executions').insert({
+      function_name: 'update-companies',
+      executed_by: isCronCall ? 'cron' : 'admin',
+      success: true,
+      summary: summary as unknown as Record<string, unknown>,
+    });
 
     return new Response(
       JSON.stringify({ 
