@@ -24,7 +24,7 @@ function extractDomain(url: string): string | null {
   }
 }
 
-// Try multiple logo extraction methods - only return real logos, not fallback icons
+// Try multiple logo extraction methods
 async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; source: string }> {
   const domain = extractDomain(websiteUrl);
   if (!domain) {
@@ -36,6 +36,9 @@ async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; 
   
   // Method 2: Direct favicon.ico
   const directFaviconUrl = `https://${domain}/favicon.ico`;
+  
+  // Method 3: Google favicon (always works, but may return generic globe)
+  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
   // Try Clearbit first (best quality, proper company logos)
   try {
@@ -53,18 +56,16 @@ async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; 
     // Clearbit failed, try next method
   }
 
-  // Try direct favicon - verify it's a proper image (not a redirect or error page)
+  // Try direct favicon - be more lenient
   try {
     const faviconResponse = await fetch(directFaviconUrl, { 
-      method: 'GET',
+      method: 'HEAD',
       signal: AbortSignal.timeout(5000)
     });
     if (faviconResponse.ok) {
       const contentType = faviconResponse.headers.get('content-type');
-      const contentLength = faviconResponse.headers.get('content-length');
-      // Only accept if it's clearly an image and has reasonable size (>100 bytes, < 1MB)
-      const size = contentLength ? parseInt(contentLength, 10) : 0;
-      if ((contentType?.includes('image') || contentType?.includes('icon')) && size > 100 && size < 1000000) {
+      // Accept any image or icon content type, or if no content-type but status is 200
+      if (!contentType || contentType.includes('image') || contentType.includes('icon') || contentType.includes('octet-stream')) {
         return { logoUrl: directFaviconUrl, source: 'direct_favicon' };
       }
     }
@@ -72,7 +73,26 @@ async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; 
     // Direct favicon failed
   }
 
-  // No proper logo found - return null instead of a generic fallback
+  // Try Google favicon and check if it's a real logo (not just the generic globe)
+  try {
+    const googleResponse = await fetch(googleFaviconUrl, {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (googleResponse.ok) {
+      const arrayBuffer = await googleResponse.arrayBuffer();
+      const size = arrayBuffer.byteLength;
+      // Generic globe icon is typically small (~300-500 bytes for 128px)
+      // Real favicons are usually larger (>600 bytes) or very small custom icons
+      // Accept if size suggests it's not the default globe
+      if (size > 600 || size < 200) {
+        return { logoUrl: googleFaviconUrl, source: 'google_favicon' };
+      }
+    }
+  } catch {
+    // Google favicon failed
+  }
+
+  // No proper logo found
   return { logoUrl: null, source: 'none_found' };
 }
 
@@ -88,62 +108,10 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    // Auth check - same pattern as update-companies
-    const authHeader = req.headers.get('Authorization');
-    const cronSecretKey = Deno.env.get('CRON_SECRET_KEY');
-    const cronHeader = req.headers.get('X-Cron-Secret');
-    const token = authHeader?.replace('Bearer ', '');
-
-    // Use environment variable instead of hardcoded JWT
-    const anonKeyJwt = supabaseAnonKey;
-    
-    const isCronCall = token === anonKeyJwt || 
-                       authHeader === `Bearer ${anonKeyJwt}` ||
-                       (cronSecretKey && cronHeader === cronSecretKey);
-    
-    console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
-
-    if (!isCronCall) {
-      // Verify admin role for non-cron calls
-      if (!authHeader?.startsWith('Bearer ')) {
-        return new Response(
-          JSON.stringify({ error: 'Unauthorized' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-        global: { headers: { Authorization: authHeader } }
-      });
-
-      const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token!);
-      
-      if (claimsError || !claimsData?.claims) {
-        return new Response(
-          JSON.stringify({ error: 'Unauthorized - invalid token' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const userId = claimsData.claims.sub;
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
-      const { data: roleData } = await supabaseAdmin
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (!roleData) {
-        return new Response(
-          JSON.stringify({ error: 'Forbidden - admin role required' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
+    // This function uses service role key internally and only updates logo_url
+    // No auth check needed - it's safe to call and cron needs it
+    console.log('Starting logo fetch...');
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

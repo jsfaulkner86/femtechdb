@@ -56,18 +56,28 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           </div>
           
           <div className="flex items-center gap-2 flex-shrink-0">
-            {company.logo_url && (
-              <div className="h-10 w-10 rounded-lg border border-border/50 bg-background overflow-hidden flex items-center justify-center">
+            <div className="h-10 w-10 rounded-lg border border-border/50 bg-muted overflow-hidden flex items-center justify-center">
+              {company.logo_url ? (
                 <img 
                   src={company.logo_url} 
                   alt={`${company.name} logo`}
                   className="h-full w-full object-contain"
                   onError={(e) => {
+                    // Hide image and show initials fallback
                     e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      const initials = company.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                      parent.innerHTML = `<span class="text-xs font-semibold text-muted-foreground">${initials}</span>`;
+                    }
                   }}
                 />
-              </div>
-            )}
+              ) : (
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {company.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
+              )}
+            </div>
             {company.website_url && (
               <Button
                 variant="ghost"
