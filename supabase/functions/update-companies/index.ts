@@ -18,6 +18,7 @@ interface CompanyData {
   continent: string | null;
   country: string | null;
   state: string | null;
+  source_url: string;
   source_verification: string[];
 }
 
@@ -285,6 +286,7 @@ ${Array.from(existingNames).slice(0, 200).join(', ')}
       "continent": "North America|Europe|Asia|Africa|South America|Oceania",
       "country": "Country name",
       "state": "State (US only, null otherwise)",
+      "source_url": "https://crunchbase.com/company/example OR https://linkedin.com/company/example",
       "source_verification": ["Source 1 URL or name", "Source 2 URL or name"]
     }
   ]
@@ -293,8 +295,10 @@ ${Array.from(existingNames).slice(0, 200).join(', ')}
 IMPORTANT:
 - Return ONLY real, verified companies with accurate information
 - The category MUST exactly match one from the list above
+- source_url is REQUIRED - must be from an approved source (Crunchbase, LinkedIn, official company website, reputable news)
 - Include source_verification array with 2+ sources for each company
-- Prioritize lesser-known innovative companies over well-funded unicorns already likely in our database`;
+- Prioritize lesser-known innovative companies over well-funded unicorns already likely in our database
+- DO NOT include any company without a verifiable source_url`;
 
     // Make AI request with retry logic
     const aiCall = async () => {
@@ -378,6 +382,14 @@ IMPORTANT:
         ? company.category 
         : 'other';
 
+      // Validate source_url is present (REQUIRED)
+      if (!company.source_url || company.source_url.trim() === '') {
+        console.log(`Skipping ${company.name}: missing required source_url`);
+        summary.companiesSkipped++;
+        summary.errors.push(`${company.name}: no source_url provided`);
+        continue;
+      }
+
       // Validate source verification (must have at least 1 source)
       const hasVerification = company.source_verification && 
                               Array.isArray(company.source_verification) && 
@@ -409,6 +421,7 @@ IMPORTANT:
           continent: c.continent,
           country: c.country,
           state: c.state,
+          source_url: c.source_url,
           is_verified: false,
         })))
         .select();
