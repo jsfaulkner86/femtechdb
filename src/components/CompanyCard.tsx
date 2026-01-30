@@ -55,19 +55,33 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
             </div>
           </div>
           
-          {company.website_url && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              asChild
-              onClick={(e) => e.stopPropagation()}
-            >
-              <SafeLink href={company.website_url}>
-                <ExternalLink className="h-4 w-4" />
-              </SafeLink>
-            </Button>
-          )}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {company.logo_url && (
+              <div className="h-10 w-10 rounded-lg border border-border/50 bg-background overflow-hidden flex items-center justify-center">
+                <img 
+                  src={company.logo_url} 
+                  alt={`${company.name} logo`}
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            {company.website_url && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                asChild
+                onClick={(e) => e.stopPropagation()}
+              >
+                <SafeLink href={company.website_url}>
+                  <ExternalLink className="h-4 w-4" />
+                </SafeLink>
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 
