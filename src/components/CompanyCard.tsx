@@ -56,14 +56,14 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           </div>
           
           <div className="flex items-center gap-2 flex-shrink-0">
-            {company.logo_url && !company.logo_url.includes('google.com/s2/favicons') && (
+            {company.logo_url && (
               <div className="h-10 w-10 rounded-lg border border-border/50 bg-background overflow-hidden flex items-center justify-center">
                 <img 
                   src={company.logo_url} 
                   alt={`${company.name} logo`}
                   className="h-full w-full object-contain"
                   onError={(e) => {
-                    (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                    e.currentTarget.style.display = 'none';
                   }}
                 />
               </div>
