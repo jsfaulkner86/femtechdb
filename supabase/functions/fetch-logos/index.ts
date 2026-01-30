@@ -90,16 +90,20 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    // Auth check
+    // Auth check - same pattern as update-companies
     const authHeader = req.headers.get('Authorization');
     const cronSecretKey = Deno.env.get('CRON_SECRET_KEY');
     const cronHeader = req.headers.get('X-Cron-Secret');
     const token = authHeader?.replace('Bearer ', '');
 
-    const anonKeyJwt = supabaseAnonKey;
+    // The actual anon key JWT for this project
+    const anonKeyJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrbW15dHdsZ2R4bGhhZGxza2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA1MzIsImV4cCI6MjA4NTE5NjUzMn0.OHDAz-Jgt0X1la_9aPP-XoVGUb_594Po7pTF4dO_cHc';
+    
     const isCronCall = token === anonKeyJwt || 
                        authHeader === `Bearer ${anonKeyJwt}` ||
                        (cronSecretKey && cronHeader === cronSecretKey);
+    
+    console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
 
     if (!isCronCall) {
       // Verify admin role for non-cron calls
