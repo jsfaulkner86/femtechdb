@@ -24,23 +24,20 @@ function extractDomain(url: string): string | null {
   }
 }
 
-// Try multiple logo extraction methods
+// Try multiple logo extraction methods - only return real logos, not fallback icons
 async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; source: string }> {
   const domain = extractDomain(websiteUrl);
   if (!domain) {
     return { logoUrl: null, source: 'invalid_url' };
   }
 
-  // Method 1: Google Favicon API (most reliable, always returns something)
-  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-  
-  // Method 2: Clearbit Logo API (higher quality, but may not have all)
+  // Method 1: Clearbit Logo API (highest quality)
   const clearbitLogoUrl = `https://logo.clearbit.com/${domain}`;
   
-  // Method 3: Direct favicon
+  // Method 2: Direct favicon.ico
   const directFaviconUrl = `https://${domain}/favicon.ico`;
 
-  // Try Clearbit first (best quality)
+  // Try Clearbit first (best quality, proper company logos)
   try {
     const clearbitResponse = await fetch(clearbitLogoUrl, { 
       method: 'HEAD',
@@ -56,24 +53,27 @@ async function fetchLogo(websiteUrl: string): Promise<{ logoUrl: string | null; 
     // Clearbit failed, try next method
   }
 
-  // Try direct favicon
+  // Try direct favicon - verify it's a proper image (not a redirect or error page)
   try {
     const faviconResponse = await fetch(directFaviconUrl, { 
-      method: 'HEAD',
+      method: 'GET',
       signal: AbortSignal.timeout(5000)
     });
     if (faviconResponse.ok) {
       const contentType = faviconResponse.headers.get('content-type');
-      if (contentType?.includes('image') || contentType?.includes('icon')) {
+      const contentLength = faviconResponse.headers.get('content-length');
+      // Only accept if it's clearly an image and has reasonable size (>100 bytes, < 1MB)
+      const size = contentLength ? parseInt(contentLength, 10) : 0;
+      if ((contentType?.includes('image') || contentType?.includes('icon')) && size > 100 && size < 1000000) {
         return { logoUrl: directFaviconUrl, source: 'direct_favicon' };
       }
     }
   } catch {
-    // Direct favicon failed, use Google fallback
+    // Direct favicon failed
   }
 
-  // Fallback to Google favicon (always works)
-  return { logoUrl: googleFaviconUrl, source: 'google_favicon' };
+  // No proper logo found - return null instead of a generic fallback
+  return { logoUrl: null, source: 'none_found' };
 }
 
 Deno.serve(async (req) => {
