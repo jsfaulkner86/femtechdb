@@ -80,9 +80,6 @@ export default function FounderPortal() {
                     <span><strong className="text-foreground">Get instant access</strong> if your email domain matches your company website</span>
                   </li>
                 </ol>
-                <p className="mt-4 text-xs text-muted-foreground border-t pt-3">
-                  Using a personal email? No problem—your claim will be reviewed by our team within 24-48 hours.
-                </p>
               </div>
             )}
           </div>
