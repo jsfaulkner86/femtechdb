@@ -17,6 +17,7 @@ export type Database = {
       companies: {
         Row: {
           category: Database["public"]["Enums"]["femtech_category"]
+          claimed_by: string | null
           continent: string | null
           country: string | null
           created_at: string
@@ -36,6 +37,7 @@ export type Database = {
         }
         Insert: {
           category?: Database["public"]["Enums"]["femtech_category"]
+          claimed_by?: string | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -55,6 +57,7 @@ export type Database = {
         }
         Update: {
           category?: Database["public"]["Enums"]["femtech_category"]
+          claimed_by?: string | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -112,6 +115,50 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      founder_claims: {
+        Row: {
+          admin_notes: string | null
+          company_id: string
+          created_at: string
+          domain_verified: boolean | null
+          id: string
+          reviewed_at: string | null
+          status: string
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          company_id: string
+          created_at?: string
+          domain_verified?: boolean | null
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          user_email: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          company_id?: string
+          created_at?: string
+          domain_verified?: boolean | null
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founder_claims_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       function_executions: {
         Row: {

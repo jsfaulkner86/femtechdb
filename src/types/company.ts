@@ -71,6 +71,7 @@ export interface Company {
   state: string | null;
   is_verified: boolean;
   source_url: string | null;
+  claimed_by: string | null;
   created_at: string;
   updated_at: string;
 }

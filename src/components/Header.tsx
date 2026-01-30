@@ -15,6 +15,7 @@ const navLinks = [
   { to: '/global-map', label: 'Global Map', icon: Globe },
   { to: '/methodology', label: 'Methodology' },
   { to: '/about', label: 'About' },
+  { to: '/founder', label: 'For Founders' },
 ];
 
 export function Header() {
