@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ExternalLink, MapPin, Calendar, BadgeCheck, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,11 @@ interface CompanyCardProps {
 }
 
 export function CompanyCard({ company, onClick }: CompanyCardProps) {
+  const [logoError, setLogoError] = useState(false);
+  
+  const getInitials = (name: string) => {
+    return name.split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
+  };
   return (
     <Card 
       className="group relative overflow-hidden border-border/50 bg-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer animate-fade-in"
@@ -56,25 +62,17 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           </div>
           
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="h-10 w-10 rounded-lg border border-border/50 bg-muted overflow-hidden flex items-center justify-center">
-              {company.logo_url ? (
+          <div className="h-10 w-10 rounded-lg border border-border/50 bg-muted overflow-hidden flex items-center justify-center">
+              {company.logo_url && !logoError ? (
                 <img 
                   src={company.logo_url} 
                   alt={`${company.name} logo`}
                   className="h-full w-full object-contain"
-                  onError={(e) => {
-                    // Hide image and show initials fallback
-                    e.currentTarget.style.display = 'none';
-                    const parent = e.currentTarget.parentElement;
-                    if (parent) {
-                      const initials = company.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-                      parent.innerHTML = `<span class="text-xs font-semibold text-muted-foreground">${initials}</span>`;
-                    }
-                  }}
+                  onError={() => setLogoError(true)}
                 />
               ) : (
                 <span className="text-xs font-semibold text-muted-foreground">
-                  {company.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                  {getInitials(company.name)}
                 </span>
               )}
             </div>
