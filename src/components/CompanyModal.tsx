@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
+import { SafeLink } from './SafeLink';
+import { isValidHttpUrl } from '@/lib/url';
 import { formatDistanceToNow, format } from 'date-fns';
 interface CompanyModalProps {
   company: Company | null;
@@ -124,34 +126,32 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
           )}
 
           {/* Source Citation */}
-          {company.source_url && (
+          {company.source_url && isValidHttpUrl(company.source_url) && (
             <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                 <Link2 className="h-3.5 w-3.5" />
                 <span className="font-medium">Source</span>
               </div>
-              <a 
-                href={company.source_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <SafeLink 
+                href={company.source_url}
                 className="text-sm text-primary hover:underline break-all"
                 onClick={(e) => e.stopPropagation()}
               >
                 {new URL(company.source_url).hostname.replace('www.', '')}
-              </a>
+              </SafeLink>
             </div>
           )}
 
           {/* CTA */}
-          {company.website_url && (
+          {company.website_url && isValidHttpUrl(company.website_url) && (
             <Button 
               className="w-full"
               asChild
             >
-              <a href={company.website_url} target="_blank" rel="noopener noreferrer">
+              <SafeLink href={company.website_url}>
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Visit Website
-              </a>
+              </SafeLink>
             </Button>
           )}
         </div>
