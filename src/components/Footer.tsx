@@ -1,5 +1,6 @@
 import { Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SocialShareButtons } from './SocialShareButtons';
 
 export function Footer() {
   return (
@@ -21,7 +22,8 @@ export function Footer() {
             <Link to="/global-map" className="hover:text-foreground transition-colors">Global Map</Link>
           </nav>
 
-          <div className="flex flex-col items-center md:items-end gap-2">
+          <div className="flex flex-col items-center md:items-end gap-3">
+            <SocialShareButtons />
             <nav className="flex items-center gap-3 text-xs text-muted-foreground">
               <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
               <span>•</span>
