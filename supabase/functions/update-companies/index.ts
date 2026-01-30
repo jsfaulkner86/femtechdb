@@ -149,7 +149,8 @@ Deno.serve(async (req) => {
     const cronHeader = req.headers.get('X-Cron-Secret');
     const token = authHeader?.replace('Bearer ', '');
 
-    const anonKeyJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrbW15dHdsZ2R4bGhhZGxza2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA1MzIsImV4cCI6MjA4NTE5NjUzMn0.OHDAz-Jgt0X1la_9aPP-XoVGUb_594Po7pTF4dO_cHc';
+    // Use environment variable instead of hardcoded JWT
+    const anonKeyJwt = supabaseAnonKey;
 
     // Check if this is a cron job call (uses anon key) or has cron secret header
     // Also accept the anon key directly in the Authorization header
