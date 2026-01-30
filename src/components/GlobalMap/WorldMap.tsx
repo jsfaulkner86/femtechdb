@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useMemo } from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -15,9 +15,101 @@ import { categoryLabels } from '@/types/company';
 
 const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
+// Pre-defined static styles to avoid recreating objects on each render
+const geoStyleDefault = {
+  fill: 'hsl(var(--muted) / 0.3)',
+  stroke: 'hsl(var(--border) / 0.5)',
+  strokeWidth: 0.5,
+  outline: 'none',
+  cursor: 'default',
+};
+
+const geoStyleDefaultWithCompanies = {
+  ...geoStyleDefault,
+  fill: 'hsl(var(--accent) / 0.15)',
+  cursor: 'pointer',
+};
+
+const geoStyleHover = {
+  fill: 'hsl(var(--muted) / 0.4)',
+  stroke: 'hsl(var(--accent))',
+  strokeWidth: 1,
+  outline: 'none',
+  cursor: 'default',
+};
+
+const geoStyleHoverWithCompanies = {
+  ...geoStyleHover,
+  fill: 'hsl(var(--accent) / 0.35)',
+  cursor: 'pointer',
+};
+
+const geoStylePressed = {
+  fill: 'hsl(var(--accent) / 0.5)',
+  stroke: 'hsl(var(--accent))',
+  strokeWidth: 1.5,
+  outline: 'none',
+};
+
 interface WorldMapProps {
   onRegionClick?: (continent: string | null, country: string | null) => void;
 }
+
+// Memoized Geography component to prevent unnecessary re-renders
+const MemoizedGeography = memo(function MemoizedGeography({
+  geo,
+  hasCompanies,
+  onHover,
+  onLeave,
+  onClick,
+}: {
+  geo: any;
+  hasCompanies: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  onClick: () => void;
+}) {
+  return (
+    <Geography
+      geography={geo}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+      style={{
+        default: hasCompanies ? geoStyleDefaultWithCompanies : geoStyleDefault,
+        hover: hasCompanies ? geoStyleHoverWithCompanies : geoStyleHover,
+        pressed: geoStylePressed,
+      }}
+    />
+  );
+});
+
+// Memoized Marker component
+const MemoizedMarker = memo(function MemoizedMarker({
+  marker,
+  onEnter,
+  onLeave,
+}: {
+  marker: CompanyLocation & { coordinates: [number, number] };
+  onEnter: (e: React.MouseEvent) => void;
+  onLeave: () => void;
+}) {
+  return (
+    <Marker
+      coordinates={marker.coordinates}
+      onMouseEnter={onEnter as any}
+      onMouseLeave={onLeave}
+    >
+      <circle
+        r={4}
+        fill="hsl(var(--accent))"
+        stroke="hsl(var(--background))"
+        strokeWidth={1.5}
+        style={{ cursor: 'pointer' }}
+      />
+    </Marker>
+  );
+});
 
 export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps) {
   const { data, isLoading } = useCompanyLocations();
@@ -32,6 +124,18 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
     coordinates: [0, 20],
     zoom: 1,
   });
+
+  // Pre-compute country lookup set for O(1) checks
+  const countriesWithCompanies = useMemo(() => {
+    if (!data?.countryGroups) return new Set<string>();
+    return new Set(data.countryGroups.map(g => g.country));
+  }, [data?.countryGroups]);
+
+  // Pre-compute country to data mapping
+  const countryDataMap = useMemo(() => {
+    if (!data?.countryGroups) return new Map<string, typeof data.countryGroups[0]>();
+    return new Map(data.countryGroups.map(g => [g.country, g]));
+  }, [data?.countryGroups]);
 
   const handleZoomIn = useCallback(() => {
     setPosition((pos) => ({ ...pos, zoom: Math.min(pos.zoom * 1.5, 8) }));
@@ -64,14 +168,23 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
   }, []);
 
   const handleGeographyClick = useCallback(
-    (geo: { properties: { name: string } }) => {
-      const countryName = geo.properties.name;
-      // Find the continent for this country
-      const countryGroup = data?.countryGroups.find(g => g.country === countryName);
+    (countryName: string) => {
+      const countryGroup = countryDataMap.get(countryName);
       onRegionClick?.(countryGroup?.continent || null, countryName);
     },
-    [data, onRegionClick]
+    [countryDataMap, onRegionClick]
   );
+
+  const handleCountryHover = useCallback((countryName: string) => {
+    setHoveredCountry(countryName);
+  }, []);
+
+  const handleCountryLeave = useCallback(() => {
+    setHoveredCountry(null);
+  }, []);
+
+  // Get hovered country data
+  const hoveredCountryData = hoveredCountry ? countryDataMap.get(hoveredCountry) : null;
 
   if (isLoading) {
     return (
@@ -150,42 +263,16 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
               {({ geographies }) =>
                 geographies.map((geo) => {
                   const countryName = geo.properties.name;
-                  const hasCompanies = data?.countryGroups.some(g => g.country === countryName);
-                  const isHovered = hoveredCountry === countryName;
+                  const hasCompanies = countriesWithCompanies.has(countryName);
                   
                   return (
-                    <Geography
+                    <MemoizedGeography
                       key={geo.rsmKey}
-                      geography={geo}
-                      onMouseEnter={() => setHoveredCountry(countryName)}
-                      onMouseLeave={() => setHoveredCountry(null)}
-                      onClick={() => handleGeographyClick(geo)}
-                      style={{
-                        default: {
-                          fill: hasCompanies 
-                            ? 'hsl(var(--accent) / 0.15)' 
-                            : 'hsl(var(--muted) / 0.3)',
-                          stroke: 'hsl(var(--border) / 0.5)',
-                          strokeWidth: 0.5,
-                          outline: 'none',
-                          cursor: hasCompanies ? 'pointer' : 'default',
-                        },
-                        hover: {
-                          fill: hasCompanies 
-                            ? 'hsl(var(--accent) / 0.35)' 
-                            : 'hsl(var(--muted) / 0.4)',
-                          stroke: 'hsl(var(--accent))',
-                          strokeWidth: 1,
-                          outline: 'none',
-                          cursor: hasCompanies ? 'pointer' : 'default',
-                        },
-                        pressed: {
-                          fill: 'hsl(var(--accent) / 0.5)',
-                          stroke: 'hsl(var(--accent))',
-                          strokeWidth: 1.5,
-                          outline: 'none',
-                        },
-                      }}
+                      geo={geo}
+                      hasCompanies={hasCompanies}
+                      onHover={() => handleCountryHover(countryName)}
+                      onLeave={handleCountryLeave}
+                      onClick={() => handleGeographyClick(countryName)}
                     />
                   );
                 })
@@ -194,36 +281,23 @@ export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps)
 
             {/* Company markers */}
             {data?.markers.map((marker) => (
-              <Marker
+              <MemoizedMarker
                 key={marker.id}
-                coordinates={marker.coordinates}
-                onMouseEnter={(e) => handleMarkerEnter(marker, e as unknown as React.MouseEvent)}
-                onMouseLeave={handleMarkerLeave}
-              >
-                <circle
-                  r={5 / position.zoom}
-                  fill="hsl(var(--accent))"
-                  stroke="hsl(var(--background))"
-                  strokeWidth={1.5 / position.zoom}
-                  style={{
-                    cursor: 'pointer',
-                    filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))',
-                    transition: 'all 0.2s ease',
-                  }}
-                  className="hover:opacity-80"
-                />
-              </Marker>
+                marker={marker}
+                onEnter={(e) => handleMarkerEnter(marker, e)}
+                onLeave={handleMarkerLeave}
+              />
             ))}
           </ZoomableGroup>
         </ComposableMap>
 
         {/* Hover tooltip for country */}
         {hoveredCountry && (
-          <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg px-3 py-2 border border-border shadow-lg animate-fade-in">
+          <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg px-3 py-2 border border-border shadow-lg">
             <p className="text-sm font-medium">{hoveredCountry}</p>
-            {data?.countryGroups.find(g => g.country === hoveredCountry) && (
+            {hoveredCountryData && (
               <p className="text-xs text-muted-foreground">
-                {data.countryGroups.find(g => g.country === hoveredCountry)?.companies.length} companies
+                {hoveredCountryData.companies.length} companies
               </p>
             )}
           </div>
