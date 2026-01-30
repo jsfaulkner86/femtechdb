@@ -113,6 +113,33 @@ export type Database = {
         }
         Relationships: []
       }
+      function_executions: {
+        Row: {
+          executed_at: string
+          executed_by: string | null
+          function_name: string
+          id: string
+          success: boolean
+          summary: Json | null
+        }
+        Insert: {
+          executed_at?: string
+          executed_by?: string | null
+          function_name: string
+          id?: string
+          success?: boolean
+          summary?: Json | null
+        }
+        Update: {
+          executed_at?: string
+          executed_by?: string | null
+          function_name?: string
+          id?: string
+          success?: boolean
+          summary?: Json | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
