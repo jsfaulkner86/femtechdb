@@ -61,6 +61,30 @@ export default function FounderPortal() {
             <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
               Claim and manage your company profile on FemtechDB
             </p>
+            
+            {/* How it works section */}
+            {!user && (
+              <div className="mt-8 rounded-xl border bg-card p-6 text-left max-w-lg mx-auto">
+                <h2 className="text-sm font-semibold text-foreground mb-3">How verification works</h2>
+                <ol className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">1</span>
+                    <span><strong className="text-foreground">Create an account</strong> using your company email (e.g., you@yourcompany.com)</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">2</span>
+                    <span><strong className="text-foreground">Search for your company</strong> in our database and submit a claim</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">3</span>
+                    <span><strong className="text-foreground">Get instant access</strong> if your email domain matches your company website</span>
+                  </li>
+                </ol>
+                <p className="mt-4 text-xs text-muted-foreground border-t pt-3">
+                  Using a personal email? No problem—your claim will be reviewed by our team within 24-48 hours.
+                </p>
+              </div>
+            )}
           </div>
 
           {!user ? (
