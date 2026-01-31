@@ -23,13 +23,18 @@ import {
   Droplets,
   CircleDot,
   Waves,
-  Smartphone
+  Smartphone,
+  Sprout,
+  HeartHandshake,
+  Dna,
+  Target,
+  Egg
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   fertility: Flower2,
   pregnancy: Baby,
-  postpartum: Heart,
+  postpartum: HeartHandshake,
   menstrual_health: Moon,
   menopause: Sparkles,
   sexual_health: Heart,
@@ -41,17 +46,17 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   precision_medicine_ai: Cpu,
   investors: TrendingUp,
   resources_community: Users,
-  reproductive_health: Flower2,
-  maternal_health: Baby,
+  reproductive_health: Sprout,
+  maternal_health: Dna,
   hormonal_health: Droplets,
   gynecological_health: ShieldPlus,
-  endometriosis: CircleDot,
+  endometriosis: Target,
   heart_disease: HeartPulse,
   pelvic_health: Waves,
   bone_health: Bone,
   cancer: Ribbon,
   mobile_apps: Smartphone,
-  pcos: CircleDot,
+  pcos: Egg,
   other: MoreHorizontal,
 };
 
