@@ -112,15 +112,21 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request for batch size
+    // Parse and validate request body
     let batchSize = 20;
     try {
       const body = await req.json();
-      if (body.batchSize && typeof body.batchSize === 'number') {
-        batchSize = Math.min(body.batchSize, 50);
+      if (body.batchSize !== undefined) {
+        if (typeof body.batchSize !== 'number' || !Number.isInteger(body.batchSize)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid batchSize - must be an integer' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        batchSize = Math.max(1, Math.min(body.batchSize, 50));
       }
     } catch {
-      // No body or invalid JSON
+      // No body or invalid JSON - use defaults
     }
 
     // Get companies without sources
