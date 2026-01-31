@@ -111,24 +111,45 @@ Deno.serve(async (req) => {
     // Use service role client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request for batch size, offset and type
+    // Parse and validate request body
     let batchSize = 50;
     let offset = 0;
     let urlType: 'website' | 'source' | 'both' = 'website';
     
+    const VALID_URL_TYPES = ['website', 'source', 'both'] as const;
+    const MAX_OFFSET = 10000;
+    
     try {
       const body = await req.json();
-      if (body.batchSize && typeof body.batchSize === 'number') {
-        batchSize = Math.min(body.batchSize, 100);
+      if (body.batchSize !== undefined) {
+        if (typeof body.batchSize !== 'number' || !Number.isInteger(body.batchSize)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid batchSize - must be an integer' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        batchSize = Math.max(1, Math.min(body.batchSize, 100));
       }
-      if (body.offset && typeof body.offset === 'number') {
-        offset = Math.max(0, body.offset);
+      if (body.offset !== undefined) {
+        if (typeof body.offset !== 'number' || !Number.isInteger(body.offset)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid offset - must be an integer' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        offset = Math.max(0, Math.min(body.offset, MAX_OFFSET));
       }
-      if (body.urlType) {
+      if (body.urlType !== undefined) {
+        if (!VALID_URL_TYPES.includes(body.urlType)) {
+          return new Response(
+            JSON.stringify({ error: `Invalid urlType - must be one of: ${VALID_URL_TYPES.join(', ')}` }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         urlType = body.urlType;
       }
     } catch {
-      // No body or invalid JSON
+      // No body or invalid JSON - use defaults
     }
 
     console.log(`Checking batch: offset=${offset}, size=${batchSize}`);

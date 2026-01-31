@@ -108,22 +108,71 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    // This function uses service role key internally and only updates logo_url
-    // No auth check needed - it's safe to call and cron needs it
-    console.log('Starting logo fetch...');
+    // Check for cron secret (for automated execution) or admin auth
+    const cronSecret = Deno.env.get('CRON_SECRET_KEY');
+    const providedCronSecret = req.headers.get('X-Cron-Secret');
+    
+    const isCronRequest = cronSecret && providedCronSecret === cronSecret;
+    
+    if (!isCronRequest) {
+      // Require admin authentication for non-cron requests
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - no authorization header' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      
+      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - invalid token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Check if user has admin role
+      const { data: hasAdminRole } = await supabaseAuth.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+
+      if (!hasAdminRole) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden - admin role required' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`Authenticated admin user: ${user.id}`);
+    } else {
+      console.log('Authenticated via cron secret');
+    }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request for batch size
+    // Parse and validate request body
     let batchSize = 50;
     try {
       const body = await req.json();
-      if (body.batchSize && typeof body.batchSize === 'number') {
-        batchSize = Math.min(body.batchSize, 200);
+      if (body.batchSize !== undefined) {
+        if (typeof body.batchSize !== 'number' || !Number.isInteger(body.batchSize)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid batchSize - must be an integer' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        batchSize = Math.max(1, Math.min(body.batchSize, 200));
       }
     } catch {
-      // No body or invalid JSON
+      // No body or invalid JSON - use defaults
     }
 
     // Get companies without logos that have website URLs
