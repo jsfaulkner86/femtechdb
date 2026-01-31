@@ -51,6 +51,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   bone_health: Bone,
   cancer: Ribbon,
   mobile_apps: Smartphone,
+  pcos: CircleDot,
   other: MoreHorizontal,
 };
 
@@ -81,6 +82,7 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   bone_health: 'text-gray-500',
   cancer: 'text-pink-600',
   mobile_apps: 'text-sky-500',
+  pcos: 'text-violet-500',
   other: 'text-gray-500',
 };
 
@@ -114,6 +116,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
     'telehealth',
     'precision_medicine_ai',
     'mobile_apps',
+    'pcos',
     'investors',
     'resources_community',
   ];
