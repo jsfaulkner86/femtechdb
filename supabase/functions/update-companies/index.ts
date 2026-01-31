@@ -274,6 +274,15 @@ Deno.serve(async (req) => {
    - FemTech venture capital portfolio pages (Rock Health, Portfolia, etc.)
    - Recognized FemTech media outlets (FemTech Insider, etc.)
 6. FDA device listings (where applicable)
+7. UNESCAP Femtech in South-East Asia Report (https://repository.unescap.org/server/api/core/bitstreams/ac306159-0343-4888-b4dc-ffc617d7ebeb/content)
+   - Contains comprehensive list of femtech companies in Indonesia, Philippines, Singapore, Thailand, Vietnam
+   - Includes market map with ~93 companies in Southeast Asia
+8. FemTech Association Asia (https://www.femtechassociation.com/)
+   - 2025 Southeast Asia Femtech Market Map
+   - Femtech Stars honorees
+   - Member directory and blog posts
+   - Substack articles with country-specific snapshots (Malaysia, Vietnam, etc.)
+9. FemTech Analytics reports and databases
 
 ## EXPLICITLY EXCLUDE:
 - Personal blogs without a registered company
@@ -323,9 +332,10 @@ ${Array.from(existingNames).slice(0, 200).join(', ')}
 IMPORTANT:
 - Return ONLY real, verified companies with accurate information
 - The category MUST exactly match one from the list above
-- source_url is REQUIRED - must be from an approved source (Crunchbase, LinkedIn, official company website, reputable news)
+- source_url is REQUIRED - must be from an approved source (Crunchbase, LinkedIn, official company website, reputable news, UNESCAP report, FemTech Association)
 - Include source_verification array with 2+ sources for each company
-- Prioritize lesser-known innovative companies over well-funded unicorns already likely in our database
+- Prioritize Southeast Asian companies from UNESCAP report and FemTech Association sources
+- Also discover companies from other regions (North America, Europe, etc.)
 - DO NOT include any company without a verifiable source_url`;
 
     // Make AI request with retry logic
