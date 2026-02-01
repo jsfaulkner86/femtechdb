@@ -13,7 +13,8 @@ import { CompanyTooltip } from './CompanyTooltip';
 import { RegionStats } from './RegionStats';
 import { categoryLabels } from '@/types/company';
 
-const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+// Using visionscarto world atlas which follows UN position on Ukraine's territorial integrity (Crimea is part of Ukraine)
+const geoUrl = 'https://cdn.jsdelivr.net/npm/visionscarto-world-atlas@0.1.0/world/110m.json';
 
 // Pre-defined static styles to avoid recreating objects on each render
 const geoStyleDefault = {
