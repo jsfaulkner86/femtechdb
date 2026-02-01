@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ExternalLink, MapPin, Calendar, BadgeCheck, Clock } from 'lucide-react';
+import { ExternalLink, MapPin, Calendar, BadgeCheck, Clock, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Company, categoryLabels, categoryColors } from '@/types/company';
+import { Company, categoryLabels, categoryColors, commercializationPhaseLabels } from '@/types/company';
 import { CompletenessIndicator } from './CompletenessIndicator';
 import { SafeLink } from './SafeLink';
 import { formatDistanceToNow } from 'date-fns';
@@ -116,7 +116,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-4 pt-2 text-xs text-muted-foreground">
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 pt-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             {company.headquarters && (
               <div className="flex items-center gap-1">
@@ -128,6 +128,12 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>{company.founded_year}</span>
+              </div>
+            )}
+            {company.commercialization_phase && (
+              <div className="flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                <span>{commercializationPhaseLabels[company.commercialization_phase]}</span>
               </div>
             )}
           </div>

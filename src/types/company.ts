@@ -1,3 +1,20 @@
+export type CommercializationPhase = 
+  | 'pre_seed'
+  | 'seed'
+  | 'early'
+  | 'growth'
+  | 'expansion_late'
+  | 'exit_ipo';
+
+export const commercializationPhaseLabels: Record<CommercializationPhase, string> = {
+  pre_seed: 'Pre-Seed',
+  seed: 'Seed',
+  early: 'Early',
+  growth: 'Growth',
+  expansion_late: 'Expansion/Late',
+  exit_ipo: 'Exit/IPO',
+};
+
 export type FemtechCategory = 
   | 'fertility'
   | 'pregnancy'
@@ -73,6 +90,7 @@ export interface Company {
   is_verified: boolean;
   source_url: string | null;
   claimed_by: string | null;
+  commercialization_phase: CommercializationPhase | null;
   created_at: string;
   updated_at: string;
 }
