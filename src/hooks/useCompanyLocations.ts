@@ -11,6 +11,7 @@ export interface CompanyLocation {
   headquarters: string | null;
   website_url: string | null;
   mission: string | null;
+  founded_year: number | null;
 }
 
 export interface LocationGroup {
@@ -111,15 +112,22 @@ function getCoordinates(company: CompanyLocation): [number, number] | null {
   return null;
 }
 
-export function useCompanyLocations() {
+export function useCompanyLocations(maxYear?: number) {
   return useQuery({
-    queryKey: ['company-locations'],
+    queryKey: ['company-locations', maxYear],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('companies')
-        .select('id, name, category, country, continent, state, headquarters, website_url, mission')
+        .select('id, name, category, country, continent, state, headquarters, website_url, mission, founded_year')
         .not('country', 'is', null)
         .order('name');
+
+      if (maxYear !== undefined) {
+        // Include companies founded up to maxYear OR with unknown founding year
+        query = query.or(`founded_year.lte.${maxYear},founded_year.is.null`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 

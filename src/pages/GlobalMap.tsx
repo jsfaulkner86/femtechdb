@@ -2,11 +2,20 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { WorldMap } from '@/components/GlobalMap';
+import { WorldMap, TimelineSlider } from '@/components/GlobalMap';
 import { Globe } from 'lucide-react';
+import { useCompanyLocations as useCompanyLocationsForTable } from '@/hooks/useCompanyLocations';
+
+const MIN_YEAR = 1920;
+const CURRENT_YEAR = new Date().getFullYear();
 
 export default function GlobalMapPage() {
   const navigate = useNavigate();
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+  
+  // Fetch data for the selected year to get counts
+  const { data: filteredData } = useCompanyLocationsForTable(selectedYear);
+  const { data: totalData } = useCompanyLocationsForTable();
 
   const handleRegionClick = (continent: string | null, country: string | null) => {
     // Navigate to home with filters applied
@@ -52,14 +61,31 @@ export default function GlobalMapPage() {
         {/* Map Section */}
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4">
-            <WorldMap onRegionClick={handleRegionClick} />
+            <WorldMap onRegionClick={handleRegionClick} maxYear={selectedYear} />
+          </div>
+        </section>
+
+        {/* Timeline Slider Section */}
+        <section className="pb-4">
+          <div className="container mx-auto px-4">
+            <TimelineSlider
+              minYear={MIN_YEAR}
+              maxYear={CURRENT_YEAR}
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+              companiesUpToYear={filteredData?.totalCompanies || 0}
+              totalCompanies={totalData?.totalCompanies || 0}
+            />
           </div>
         </section>
 
         {/* Top Countries Table */}
         <section className="pb-12">
           <div className="container mx-auto px-4">
-            <TopCountriesTable onCountryClick={(country) => handleRegionClick(null, country)} />
+            <TopCountriesTable 
+              onCountryClick={(country) => handleRegionClick(null, country)} 
+              maxYear={selectedYear}
+            />
           </div>
         </section>
       </main>
@@ -69,8 +95,8 @@ export default function GlobalMapPage() {
   );
 }
 
-function TopCountriesTable({ onCountryClick }: { onCountryClick: (country: string) => void }) {
-  const { data } = useCompanyLocationsForTable();
+function TopCountriesTable({ onCountryClick, maxYear }: { onCountryClick: (country: string) => void; maxYear?: number }) {
+  const { data } = useCompanyLocationsForTable(maxYear);
 
   if (!data) return null;
 
@@ -108,6 +134,3 @@ function TopCountriesTable({ onCountryClick }: { onCountryClick: (country: strin
     </div>
   );
 }
-
-// Import the hook for the table
-import { useCompanyLocations as useCompanyLocationsForTable } from '@/hooks/useCompanyLocations';

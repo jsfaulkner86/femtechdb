@@ -53,6 +53,7 @@ const geoStylePressed = {
 
 interface WorldMapProps {
   onRegionClick?: (continent: string | null, country: string | null) => void;
+  maxYear?: number;
 }
 
 // Memoized Geography component to prevent unnecessary re-renders
@@ -111,8 +112,8 @@ const MemoizedMarker = memo(function MemoizedMarker({
   );
 });
 
-export const WorldMap = memo(function WorldMap({ onRegionClick }: WorldMapProps) {
-  const { data, isLoading } = useCompanyLocations();
+export const WorldMap = memo(function WorldMap({ onRegionClick, maxYear }: WorldMapProps) {
+  const { data, isLoading } = useCompanyLocations(maxYear);
   const [tooltipContent, setTooltipContent] = useState<{
     company: CompanyLocation & { coordinates: [number, number] };
     position: { x: number; y: number };
