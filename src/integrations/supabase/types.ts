@@ -18,6 +18,9 @@ export type Database = {
         Row: {
           category: Database["public"]["Enums"]["femtech_category"]
           claimed_by: string | null
+          commercialization_phase:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
           continent: string | null
           country: string | null
           created_at: string
@@ -38,6 +41,9 @@ export type Database = {
         Insert: {
           category?: Database["public"]["Enums"]["femtech_category"]
           claimed_by?: string | null
+          commercialization_phase?:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -58,6 +64,9 @@ export type Database = {
         Update: {
           category?: Database["public"]["Enums"]["femtech_category"]
           claimed_by?: string | null
+          commercialization_phase?:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -223,6 +232,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      commercialization_phase:
+        | "pre_seed"
+        | "seed"
+        | "early"
+        | "growth"
+        | "expansion_late"
+        | "exit_ipo"
       femtech_category:
         | "fertility"
         | "pregnancy"
@@ -378,6 +394,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      commercialization_phase: [
+        "pre_seed",
+        "seed",
+        "early",
+        "growth",
+        "expansion_late",
+        "exit_ipo",
+      ],
       femtech_category: [
         "fertility",
         "pregnancy",
