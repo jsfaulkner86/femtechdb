@@ -74,13 +74,21 @@ export const usStates = [
 
 export type USState = typeof usStates[number];
 
+export interface CompanyCategory {
+  id: string;
+  company_id: string;
+  category: FemtechCategory;
+  created_at: string;
+}
+
 export interface Company {
   id: string;
   name: string;
   mission: string | null;
   problem: string | null;
   solution: string | null;
-  category: FemtechCategory;
+  category: FemtechCategory; // Primary category (legacy, still in companies table)
+  categories?: FemtechCategory[]; // All categories from junction table
   website_url: string | null;
   logo_url: string | null;
   founded_year: number | null;

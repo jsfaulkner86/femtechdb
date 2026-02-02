@@ -42,9 +42,13 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
                 )}
               </div>
               
-              <Badge className={categoryColors[company.category]}>
-                {categoryLabels[company.category]}
-              </Badge>
+              <div className="flex flex-wrap gap-2">
+                {(company.categories || [company.category]).map((cat) => (
+                  <Badge key={cat} className={categoryColors[cat]}>
+                    {categoryLabels[cat]}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </DialogHeader>

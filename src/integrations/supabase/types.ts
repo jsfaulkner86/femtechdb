@@ -86,6 +86,35 @@ export type Database = {
         }
         Relationships: []
       }
+      company_categories: {
+        Row: {
+          category: Database["public"]["Enums"]["femtech_category"]
+          company_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["femtech_category"]
+          company_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["femtech_category"]
+          company_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_categories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_submissions: {
         Row: {
           admin_notes: string | null

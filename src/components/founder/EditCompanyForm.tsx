@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Save, ExternalLink } from 'lucide-react';
+import { Loader2, Save, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import {
   Form,
   FormControl,
@@ -24,6 +25,7 @@ import {
 import { useUpdateCompany } from '@/hooks/useFounderClaims';
 import { toast } from 'sonner';
 import type { Company, FemtechCategory } from '@/types/company';
+import { categoryLabels, categoryColors } from '@/types/company';
 import { Constants } from '@/integrations/supabase/types';
 
 const companySchema = z.object({
@@ -32,43 +34,13 @@ const companySchema = z.object({
   logo_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   headquarters: z.string().max(100).optional().or(z.literal('')),
   founded_year: z.coerce.number().min(1900).max(new Date().getFullYear()).optional().or(z.literal('')),
-  category: z.string(),
+  categories: z.array(z.string()).min(1, 'At least one category is required'),
   mission: z.string().max(500, 'Mission must be under 500 characters').optional().or(z.literal('')),
   problem: z.string().max(1000, 'Problem description must be under 1000 characters').optional().or(z.literal('')),
   solution: z.string().max(1000, 'Solution description must be under 1000 characters').optional().or(z.literal('')),
 });
 
 type CompanyFormData = z.infer<typeof companySchema>;
-
-const categoryLabels: Record<FemtechCategory, string> = {
-  fertility: 'Fertility',
-  pregnancy: 'Pregnancy',
-  postpartum: 'Postpartum',
-  menstrual_health: 'Menstrual Health',
-  menopause: 'Menopause',
-  sexual_health: 'Sexual Health',
-  mental_health: 'Mental Health',
-  general_wellness: 'General Wellness',
-  chronic_conditions: 'Chronic Conditions',
-  diagnostics: 'Diagnostics',
-  telehealth: 'Telehealth',
-  other: 'Other',
-  investors: 'Investors',
-  resources_community: 'Resources & Community',
-  precision_medicine_ai: 'Precision Medicine & AI',
-  reproductive_health: 'Reproductive Health',
-  maternal_health: 'Maternal Health',
-  hormonal_health: 'Hormonal Health',
-  gynecological_health: 'Gynecological Health',
-  endometriosis: 'Endometriosis',
-  heart_disease: 'Heart Disease',
-  pelvic_health: 'Pelvic Health',
-  bone_health: 'Bone Health',
-  cancer: 'Cancer',
-  mobile_apps: 'Mobile Apps',
-  pcos: 'PCOS',
-  conferences: 'Conferences',
-};
 
 interface EditCompanyFormProps {
   company: Company;
@@ -85,15 +57,32 @@ export function EditCompanyForm({ company }: EditCompanyFormProps) {
       logo_url: company.logo_url || '',
       headquarters: company.headquarters || '',
       founded_year: company.founded_year || '',
-      category: company.category,
+      categories: company.categories || [company.category],
       mission: company.mission || '',
       problem: company.problem || '',
       solution: company.solution || '',
     },
   });
 
+  const selectedCategories = form.watch('categories') as FemtechCategory[];
+
+  const addCategory = (category: string) => {
+    const current = form.getValues('categories');
+    if (!current.includes(category)) {
+      form.setValue('categories', [...current, category], { shouldValidate: true });
+    }
+  };
+
+  const removeCategory = (category: string) => {
+    const current = form.getValues('categories');
+    if (current.length > 1) {
+      form.setValue('categories', current.filter(c => c !== category), { shouldValidate: true });
+    }
+  };
+
   const onSubmit = async (data: CompanyFormData) => {
     try {
+      const primaryCategory = data.categories[0] as FemtechCategory;
       await updateCompany.mutateAsync({
         companyId: company.id,
         updates: {
@@ -102,17 +91,22 @@ export function EditCompanyForm({ company }: EditCompanyFormProps) {
           logo_url: data.logo_url || null,
           headquarters: data.headquarters || null,
           founded_year: data.founded_year ? Number(data.founded_year) : null,
-          category: data.category as FemtechCategory,
+          category: primaryCategory, // Keep legacy field updated
           mission: data.mission || null,
           problem: data.problem || null,
           solution: data.solution || null,
         },
+        categories: data.categories as FemtechCategory[],
       });
       toast.success('Company profile updated successfully');
     } catch (error: any) {
       toast.error(error.message || 'Failed to update company');
     }
   };
+
+  const availableCategories = Constants.public.Enums.femtech_category.filter(
+    cat => !selectedCategories.includes(cat as FemtechCategory)
+  );
 
   return (
     <Form {...form}>
@@ -191,24 +185,46 @@ export function EditCompanyForm({ company }: EditCompanyFormProps) {
 
           <FormField
             control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Constants.public.Enums.femtech_category.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {categoryLabels[cat as FemtechCategory]}
-                      </SelectItem>
+            name="categories"
+            render={() => (
+              <FormItem className="sm:col-span-2">
+                <FormLabel>Categories</FormLabel>
+                <div className="space-y-3">
+                  {/* Selected categories */}
+                  <div className="flex flex-wrap gap-2 min-h-[32px]">
+                    {selectedCategories.map((cat) => (
+                      <Badge 
+                        key={cat} 
+                        className={`${categoryColors[cat]} cursor-pointer flex items-center gap-1`}
+                        onClick={() => removeCategory(cat)}
+                      >
+                        {categoryLabels[cat]}
+                        <X className="h-3 w-3" />
+                      </Badge>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                  
+                  {/* Add category dropdown */}
+                  {availableCategories.length > 0 && (
+                    <Select onValueChange={addCategory} value="">
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Add a category..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableCategories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {categoryLabels[cat as FemtechCategory]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <FormDescription>
+                  Click on a category to remove it. Companies can belong to multiple categories.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
