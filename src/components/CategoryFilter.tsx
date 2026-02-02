@@ -105,6 +105,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
   const categories: (FemtechCategory | 'all')[] = [
     'all',
     'fertility',
+    'preconception_care',
     'reproductive_health',
     'pregnancy',
     'maternal_health',
