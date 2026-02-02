@@ -113,6 +113,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "company_categories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       company_submissions: {
@@ -196,6 +203,13 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "founder_claims_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       function_executions: {
@@ -248,7 +262,75 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      companies_public: {
+        Row: {
+          category: Database["public"]["Enums"]["femtech_category"] | null
+          commercialization_phase:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
+          continent: string | null
+          country: string | null
+          created_at: string | null
+          founded_year: number | null
+          headquarters: string | null
+          id: string | null
+          is_verified: boolean | null
+          logo_url: string | null
+          mission: string | null
+          name: string | null
+          problem: string | null
+          solution: string | null
+          source_url: string | null
+          state: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["femtech_category"] | null
+          commercialization_phase?:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
+          continent?: string | null
+          country?: string | null
+          created_at?: string | null
+          founded_year?: number | null
+          headquarters?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          mission?: string | null
+          name?: string | null
+          problem?: string | null
+          solution?: string | null
+          source_url?: string | null
+          state?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["femtech_category"] | null
+          commercialization_phase?:
+            | Database["public"]["Enums"]["commercialization_phase"]
+            | null
+          continent?: string | null
+          country?: string | null
+          created_at?: string | null
+          founded_year?: number | null
+          headquarters?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          mission?: string | null
+          name?: string | null
+          problem?: string | null
+          solution?: string | null
+          source_url?: string | null
+          state?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
