@@ -59,6 +59,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   mobile_apps: Smartphone,
   pcos: Egg,
   conferences: Calendar,
+  preconception_care: Baby,
   other: MoreHorizontal,
 };
 
@@ -91,6 +92,7 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   mobile_apps: 'text-sky-500',
   pcos: 'text-violet-500',
   conferences: 'text-amber-500',
+  preconception_care: 'text-pink-500',
   other: 'text-gray-500',
 };
 

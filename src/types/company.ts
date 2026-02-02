@@ -42,6 +42,7 @@ export type FemtechCategory =
   | 'mobile_apps'
   | 'pcos'
   | 'conferences'
+  | 'preconception_care'
   | 'other';
 
 export type Continent = 
@@ -131,6 +132,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   mobile_apps: 'Mobile Apps',
   pcos: 'PCOS',
   conferences: 'Conferences',
+  preconception_care: 'Preconception Care',
   other: 'Other',
 };
 
@@ -161,5 +163,6 @@ export const categoryColors: Record<FemtechCategory, string> = {
   mobile_apps: 'bg-primary text-primary-foreground',
   pcos: 'bg-violet-500 text-primary-foreground',
   conferences: 'bg-amber-500 text-primary-foreground',
+  preconception_care: 'bg-pink-500 text-primary-foreground',
   other: 'bg-muted text-muted-foreground',
 };
