@@ -67,6 +67,7 @@ const categoryLabels: Record<FemtechCategory, string> = {
   cancer: 'Cancer',
   mobile_apps: 'Mobile Apps',
   pcos: 'PCOS',
+  conferences: 'Conferences',
 };
 
 interface EditCompanyFormProps {

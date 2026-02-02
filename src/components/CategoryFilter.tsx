@@ -28,7 +28,8 @@ import {
   HeartHandshake,
   Dna,
   Target,
-  Egg
+  Egg,
+  Calendar
 } from 'lucide-react';
 
 const categoryIcons: Record<FemtechCategory, React.ElementType> = {
@@ -57,6 +58,7 @@ const categoryIcons: Record<FemtechCategory, React.ElementType> = {
   cancer: Ribbon,
   mobile_apps: Smartphone,
   pcos: Egg,
+  conferences: Calendar,
   other: MoreHorizontal,
 };
 
@@ -88,6 +90,7 @@ const categoryIconColors: Record<FemtechCategory | 'all', string> = {
   cancer: 'text-pink-600',
   mobile_apps: 'text-sky-500',
   pcos: 'text-violet-500',
+  conferences: 'text-amber-500',
   other: 'text-gray-500',
 };
 
@@ -124,6 +127,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
     'pcos',
     'investors',
     'resources_community',
+    'conferences',
   ];
 
   return (

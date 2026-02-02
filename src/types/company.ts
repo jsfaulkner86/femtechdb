@@ -41,6 +41,7 @@ export type FemtechCategory =
   | 'cancer'
   | 'mobile_apps'
   | 'pcos'
+  | 'conferences'
   | 'other';
 
 export type Continent = 
@@ -121,6 +122,7 @@ export const categoryLabels: Record<FemtechCategory, string> = {
   cancer: 'Cancer',
   mobile_apps: 'Mobile Apps',
   pcos: 'PCOS',
+  conferences: 'Conferences',
   other: 'Other',
 };
 
@@ -150,5 +152,6 @@ export const categoryColors: Record<FemtechCategory, string> = {
   cancer: 'bg-secondary text-secondary-foreground',
   mobile_apps: 'bg-primary text-primary-foreground',
   pcos: 'bg-violet-500 text-primary-foreground',
+  conferences: 'bg-amber-500 text-primary-foreground',
   other: 'bg-muted text-muted-foreground',
 };
