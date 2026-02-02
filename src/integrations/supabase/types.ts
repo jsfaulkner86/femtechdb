@@ -378,6 +378,7 @@ export type Database = {
         | "mobile_apps"
         | "pcos"
         | "conferences"
+        | "preconception_care"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -542,6 +543,7 @@ export const Constants = {
         "mobile_apps",
         "pcos",
         "conferences",
+        "preconception_care",
       ],
     },
   },
