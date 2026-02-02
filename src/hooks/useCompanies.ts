@@ -78,7 +78,8 @@ export function useCompanyCount() {
     queryFn: async () => {
       const { count, error } = await supabase
         .from('companies')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .neq('category', 'conferences');
 
       if (error) {
         throw error;
