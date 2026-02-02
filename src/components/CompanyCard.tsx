@@ -50,13 +50,21 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               )}
             </div>
             
-            <div className="flex items-center gap-2 mt-2">
-              <Badge 
-                variant="secondary"
-                className={categoryColors[company.category]}
-              >
-                {categoryLabels[company.category]}
-              </Badge>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              {(company.categories || [company.category]).slice(0, 3).map((cat, idx) => (
+                <Badge 
+                  key={cat}
+                  variant="secondary"
+                  className={`${categoryColors[cat]} ${idx > 0 ? 'text-xs px-2 py-0.5' : ''}`}
+                >
+                  {categoryLabels[cat]}
+                </Badge>
+              ))}
+              {(company.categories || []).length > 3 && (
+                <Badge variant="outline" className="text-xs px-2 py-0.5">
+                  +{(company.categories || []).length - 3}
+                </Badge>
+              )}
               <CompletenessIndicator company={company} />
             </div>
           </div>

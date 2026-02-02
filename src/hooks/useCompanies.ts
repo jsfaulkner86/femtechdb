@@ -14,40 +14,86 @@ export function useCompanies({ search, category, continent, country, state }: Us
   return useQuery({
     queryKey: ['companies', search, category, continent, country, state],
     queryFn: async () => {
+      // If filtering by category, we need to find companies that have that category in the junction table
+      if (category && category !== 'all') {
+        // Get company IDs that have this category
+        const { data: categoryData, error: categoryError } = await supabase
+          .from('company_categories')
+          .select('company_id')
+          .eq('category', category);
+
+        if (categoryError) throw categoryError;
+
+        const companyIds = categoryData?.map(c => c.company_id) || [];
+        
+        if (companyIds.length === 0) {
+          return [];
+        }
+
+        // Build main query with company ID filter
+        let query = supabase
+          .from('companies')
+          .select('*')
+          .in('id', companyIds)
+          .order('name');
+
+        if (search && search.trim()) {
+          const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
+          query = query.or(`name.ilike.%${sanitizedSearch}%,mission.ilike.%${sanitizedSearch}%,problem.ilike.%${sanitizedSearch}%,solution.ilike.%${sanitizedSearch}%`);
+        }
+
+        if (continent) query = query.eq('continent', continent);
+        if (country) query = query.eq('country', country);
+        if (state) query = query.eq('state', state);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Fetch all categories for these companies
+        const { data: allCategories } = await supabase
+          .from('company_categories')
+          .select('company_id, category')
+          .in('company_id', data?.map(c => c.id) || []);
+
+        // Map categories to companies
+        return (data || []).map(company => ({
+          ...company,
+          categories: allCategories
+            ?.filter(cc => cc.company_id === company.id)
+            .map(cc => cc.category as FemtechCategory) || [company.category]
+        })) as Company[];
+      }
+
+      // No category filter - fetch all companies
       let query = supabase
         .from('companies')
         .select('*')
         .order('name');
 
       if (search && search.trim()) {
-        // Sanitize search input: trim, limit length, and escape ILIKE pattern characters
         const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
         query = query.or(`name.ilike.%${sanitizedSearch}%,mission.ilike.%${sanitizedSearch}%,problem.ilike.%${sanitizedSearch}%,solution.ilike.%${sanitizedSearch}%`);
       }
 
-      if (category && category !== 'all') {
-        query = query.eq('category', category);
-      }
-
-      if (continent) {
-        query = query.eq('continent', continent);
-      }
-
-      if (country) {
-        query = query.eq('country', country);
-      }
-
-      if (state) {
-        query = query.eq('state', state);
-      }
+      if (continent) query = query.eq('continent', continent);
+      if (country) query = query.eq('country', country);
+      if (state) query = query.eq('state', state);
 
       const { data, error } = await query;
+      if (error) throw error;
 
-      if (error) {
-        throw error;
-      }
+      // Fetch all categories for these companies
+      const { data: allCategories } = await supabase
+        .from('company_categories')
+        .select('company_id, category');
 
-      return data as Company[];
+      // Map categories to companies
+      return (data || []).map(company => ({
+        ...company,
+        categories: allCategories
+          ?.filter(cc => cc.company_id === company.id)
+          .map(cc => cc.category as FemtechCategory) || [company.category]
+      })) as Company[];
     },
   });
 }
@@ -66,7 +112,18 @@ export function useCompany(id: string) {
         throw error;
       }
 
-      return data as Company | null;
+      if (!data) return null;
+
+      // Fetch categories for this company
+      const { data: categories } = await supabase
+        .from('company_categories')
+        .select('category')
+        .eq('company_id', id);
+
+      return {
+        ...data,
+        categories: categories?.map(c => c.category as FemtechCategory) || [data.category]
+      } as Company;
     },
     enabled: !!id,
   });
@@ -76,16 +133,26 @@ export function useCompanyCount() {
   return useQuery({
     queryKey: ['companies-count'],
     queryFn: async () => {
-      const { count, error } = await supabase
+      // Count companies that don't have 'conferences' as their ONLY category
+      // First get all companies
+      const { data: allCompanies, error: companyError } = await supabase
         .from('companies')
-        .select('*', { count: 'exact', head: true })
+        .select('id');
+
+      if (companyError) throw companyError;
+
+      // Get companies that have at least one non-conference category
+      const { data: nonConferenceCategories, error: categoryError } = await supabase
+        .from('company_categories')
+        .select('company_id')
         .neq('category', 'conferences');
 
-      if (error) {
-        throw error;
-      }
+      if (categoryError) throw categoryError;
 
-      return count ?? 0;
+      // Get unique company IDs that have non-conference categories
+      const nonConferenceCompanyIds = new Set(nonConferenceCategories?.map(c => c.company_id) || []);
+
+      return nonConferenceCompanyIds.size;
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Company } from '@/types/company';
+import type { Company, FemtechCategory } from '@/types/company';
 
 interface FounderClaim {
   id: string;
@@ -46,7 +46,18 @@ export function useClaimedCompany(userId: string | undefined) {
         .maybeSingle();
 
       if (error) throw error;
-      return data as Company | null;
+      if (!data) return null;
+
+      // Fetch categories for this company
+      const { data: categories } = await supabase
+        .from('company_categories')
+        .select('category')
+        .eq('company_id', data.id);
+
+      return {
+        ...data,
+        categories: categories?.map(c => c.category as FemtechCategory) || [data.category]
+      } as Company;
     },
     enabled: !!userId,
   });
@@ -86,24 +97,50 @@ export function useUpdateCompany() {
   return useMutation({
     mutationFn: async ({ 
       companyId, 
-      updates 
+      updates,
+      categories
     }: { 
       companyId: string; 
       updates: Partial<Company>;
+      categories?: FemtechCategory[];
     }) => {
+      // Update company data (excluding categories array)
+      const { categories: _, ...companyUpdates } = updates as any;
+      
       const { data, error } = await supabase
         .from('companies')
-        .update(updates)
+        .update(companyUpdates)
         .eq('id', companyId)
         .select()
         .single();
 
       if (error) throw error;
+
+      // Update categories if provided
+      if (categories && categories.length > 0) {
+        // Delete existing categories
+        await supabase
+          .from('company_categories')
+          .delete()
+          .eq('company_id', companyId);
+
+        // Insert new categories
+        const { error: categoryError } = await supabase
+          .from('company_categories')
+          .insert(categories.map(cat => ({
+            company_id: companyId,
+            category: cat
+          })));
+
+        if (categoryError) throw categoryError;
+      }
+
       return data as Company;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       queryClient.invalidateQueries({ queryKey: ['claimed-company'] });
+      queryClient.invalidateQueries({ queryKey: ['company'] });
     },
   });
 }
