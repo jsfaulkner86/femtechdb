@@ -11,7 +11,7 @@ import { FeaturedCompanies } from '@/components/FeaturedCompanies';
 import { DatabaseStats } from '@/components/DatabaseStats';
 import { useCompanies } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
-import { useDebounce } from '@/hooks/useDebounce';
+
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,10 +46,8 @@ const Index = () => {
     setSearchParams(params, { replace: true });
   };
 
-  const debouncedSearch = useDebounce(searchQuery, 300);
-
   const { data: companies, isLoading } = useCompanies({
-    search: debouncedSearch,
+    search: searchQuery,
     category: selectedCategory,
     continent: geoFilters.continent,
     country: geoFilters.country,

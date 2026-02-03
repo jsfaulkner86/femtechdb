@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCompanyCount } from '@/hooks/useCompanies';
@@ -7,11 +8,30 @@ interface HeroSectionProps {
   onSearchChange: (value: string) => void;
 }
 
-export function HeroSection({
+export const HeroSection = memo(function HeroSection({
   searchQuery,
   onSearchChange
 }: HeroSectionProps) {
+  // Local state for immediate input responsiveness
+  const [localSearch, setLocalSearch] = useState(searchQuery);
   const { data: companyCount } = useCompanyCount();
+
+  // Sync local state when parent searchQuery changes (e.g., on clear)
+  useEffect(() => {
+    if (searchQuery !== localSearch) {
+      setLocalSearch(searchQuery);
+    }
+  }, [searchQuery]);
+
+  // Debounced callback to parent
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearchChange, searchQuery]);
   return <section className="relative overflow-hidden bg-gradient-subtle py-20 md:py-28">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -50,7 +70,7 @@ export function HeroSection({
         }}>
             <div className="relative mx-auto max-w-xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input type="search" placeholder="Search companies, solutions, health areas..." value={searchQuery} onChange={e => onSearchChange(e.target.value)} className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300" />
+              <Input type="search" placeholder="Search companies, solutions, health areas..." value={localSearch} onChange={e => setLocalSearch(e.target.value)} className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300" />
             </div>
           </div>
 
@@ -78,4 +98,4 @@ export function HeroSection({
         </div>
       </div>
     </section>;
-}
+});
