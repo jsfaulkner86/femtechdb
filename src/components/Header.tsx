@@ -16,6 +16,7 @@ const navLinks = [
   { to: '/methodology', label: 'Methodology' },
   { to: '/about', label: 'About' },
   { to: '/founder', label: 'For Founders' },
+  { to: '/for-patients', label: 'For Patients' },
 ];
 
 export function Header() {
