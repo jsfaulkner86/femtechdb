@@ -25,7 +25,7 @@ const ForPatients = () => {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 py-16">
+        <section className="container mx-auto px-4 py-8">
           <ProblemSearch />
         </section>
       </main>
