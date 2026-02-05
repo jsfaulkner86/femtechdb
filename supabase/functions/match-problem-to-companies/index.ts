@@ -89,7 +89,17 @@ serve(async (req) => {
       );
     }
 
-    // Pre-filter companies using keyword matching to reduce AI processing time
+    // Shuffle function for randomization
+    const shuffle = <T>(array: T[]): T[] => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
+    // Pre-filter companies using keyword matching
     const keywords = problemDescription.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     
     const scoredCompanies = companies.map(c => {
@@ -101,20 +111,61 @@ serve(async (req) => {
       return { company: c, score };
     });
 
-    // Sort by relevance score and take top 50 candidates
-    const topCandidates = scoredCompanies
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 50)
-      .map(s => s.company);
+    // Group by score tiers to add randomization within relevance levels
+    const highRelevance = shuffle(scoredCompanies.filter(s => s.score >= 2).map(s => s.company));
+    const mediumRelevance = shuffle(scoredCompanies.filter(s => s.score === 1).map(s => s.company));
+    const lowRelevance = shuffle(scoredCompanies.filter(s => s.score === 0).map(s => s.company));
 
-    if (topCandidates.length === 0) {
-      // If no keyword matches, take a sample of companies
-      topCandidates.push(...companies.slice(0, 30));
+    // Build diverse candidate pool
+    const candidatePool: Company[] = [];
+    const seenIds = new Set<string>();
+
+    // Add high relevance matches (shuffled)
+    for (const c of highRelevance.slice(0, 25)) {
+      if (!seenIds.has(c.id)) {
+        candidatePool.push(c);
+        seenIds.add(c.id);
+      }
     }
 
-    console.log(`Pre-filtered to ${topCandidates.length} candidates from ${companies.length} total`);
+    // Add medium relevance matches (shuffled)
+    for (const c of mediumRelevance.slice(0, 15)) {
+      if (!seenIds.has(c.id)) {
+        candidatePool.push(c);
+        seenIds.add(c.id);
+      }
+    }
 
-    // Prepare company data for AI matching (now with reduced set)
+    // Add random samples from different categories for diversity
+    const categories = [...new Set(companies.map(c => c.category))];
+    const shuffledCategories = shuffle(categories);
+    
+    for (const category of shuffledCategories) {
+      if (candidatePool.length >= 50) break;
+      const categoryCompanies = shuffle(companies.filter(c => c.category === category && !seenIds.has(c.id)));
+      for (const c of categoryCompanies.slice(0, 3)) {
+        if (!seenIds.has(c.id) && candidatePool.length < 50) {
+          candidatePool.push(c);
+          seenIds.add(c.id);
+        }
+      }
+    }
+
+    // Fill remaining slots with random companies if needed
+    if (candidatePool.length < 30) {
+      const remaining = shuffle(lowRelevance.filter(c => !seenIds.has(c.id)));
+      for (const c of remaining.slice(0, 30 - candidatePool.length)) {
+        candidatePool.push(c);
+        seenIds.add(c.id);
+      }
+    }
+
+    // Final shuffle of candidates to avoid ordering bias
+    const topCandidates = shuffle(candidatePool);
+
+    console.log(`Diversified pool: ${topCandidates.length} candidates from ${companies.length} total (${categories.length} categories)`);
+
+    // Prepare company data for AI matching (shuffled order)
     const companiesText = topCandidates
       .map(
         (c) =>
@@ -185,11 +236,13 @@ async function callLovableAI(
     throw new Error("LOVABLE_API_KEY is not configured");
   }
 
-  const systemPrompt = `You are a healthcare solution matcher. Analyze the patient's health concern and match it to the most relevant companies from the provided list.
+  const systemPrompt = `You are an unbiased healthcare solution matcher. Analyze the patient's health concern and match it to the most relevant companies from the provided list.
+
+IMPORTANT: Evaluate each company fairly based solely on how well their problem/solution aligns with the patient's concern. Do not favor companies based on their position in the list or name recognition.
 
 For each matched company, provide:
-1. Company name
-2. Relevance score (0-1)
+1. Company name (exact match from the list)
+2. Relevance score (0-1) based on alignment with patient's specific needs
 3. Brief reason why it matches
 
 Return results as JSON array with structure:
@@ -201,7 +254,7 @@ Return results as JSON array with structure:
   }
 ]
 
-Return ONLY the JSON array, no other text. Match 1-5 companies that address the patient's specific health concern, symptoms, or goals. Prioritize companies with the highest relevance.`;
+Return ONLY the JSON array, no other text. Match 1-5 companies that best address the patient's specific health concern, symptoms, or goals. Prioritize relevance over familiarity.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
