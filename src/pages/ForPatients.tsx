@@ -21,12 +21,9 @@ const ForPatients = () => {
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                 Tell us about your health concerns and we'll match you with relevant solutions and companies that address your specific needs.
               </p>
+              <ProblemSearch />
             </div>
           </div>
-        </section>
-
-        <section className="container mx-auto px-4 py-8">
-          <ProblemSearch />
         </section>
       </main>
 
