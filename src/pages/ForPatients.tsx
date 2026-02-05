@@ -1,5 +1,6 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ProblemSearch } from '@/components/ProblemSearch';
 
 const ForPatients = () => {
   return (
@@ -25,9 +26,7 @@ const ForPatients = () => {
         </section>
 
         <section className="container mx-auto px-4 py-16">
-          <div className="max-w-2xl mx-auto text-center text-muted-foreground">
-            <p>Problem-to-solution search interface coming soon...</p>
-          </div>
+          <ProblemSearch />
         </section>
       </main>
 
