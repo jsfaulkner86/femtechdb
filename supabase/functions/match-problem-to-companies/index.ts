@@ -89,19 +89,44 @@ serve(async (req) => {
       );
     }
 
-    // Prepare company data for AI matching
-    const companiesText = companies
+    // Pre-filter companies using keyword matching to reduce AI processing time
+    const keywords = problemDescription.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    
+    const scoredCompanies = companies.map(c => {
+      const searchText = `${c.name} ${c.category} ${c.problem || ''} ${c.solution || ''} ${c.mission || ''}`.toLowerCase();
+      let score = 0;
+      for (const keyword of keywords) {
+        if (searchText.includes(keyword)) score++;
+      }
+      return { company: c, score };
+    });
+
+    // Sort by relevance score and take top 50 candidates
+    const topCandidates = scoredCompanies
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 50)
+      .map(s => s.company);
+
+    if (topCandidates.length === 0) {
+      // If no keyword matches, take a sample of companies
+      topCandidates.push(...companies.slice(0, 30));
+    }
+
+    console.log(`Pre-filtered to ${topCandidates.length} candidates from ${companies.length} total`);
+
+    // Prepare company data for AI matching (now with reduced set)
+    const companiesText = topCandidates
       .map(
         (c) =>
-          `Company: ${c.name}\nCategory: ${c.category}\nProblem addressed: ${c.problem || "Not specified"}\nSolution offered: ${c.solution || "Not specified"}\nMission: ${c.mission || "Not specified"}`
+          `Company: ${c.name}\nCategory: ${c.category}\nProblem: ${c.problem || "N/A"}\nSolution: ${c.solution || "N/A"}`
       )
-      .join("\n\n---\n\n");
+      .join("\n---\n");
 
-    // Call Lovable AI to match problems
+    // Call Lovable AI to match problems (with pre-filtered candidates)
     const aiResponse = await callLovableAI(problemDescription, companiesText);
 
     // Parse the AI response to get matched companies
-    const matches = parseAIResponse(aiResponse, companies);
+    const matches = parseAIResponse(aiResponse, topCandidates);
 
     return new Response(
       JSON.stringify({ matches }),
