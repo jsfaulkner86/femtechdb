@@ -47,10 +47,39 @@ serve(async (req) => {
       );
     }
 
-    // Fetch all companies with their problem/solution data
-    const companies = await fetchAllCompanies();
+    // Get environment variables - these should be set by Lovable Cloud
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    if (companies.length === 0) {
+    console.log("Environment check:", {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseAnonKey,
+    });
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error(
+        `Missing environment variables: url=${!!supabaseUrl}, key=${!!supabaseAnonKey}`
+      );
+    }
+
+    // Fetch all companies
+    const companiesUrl = `${supabaseUrl}/rest/v1/companies?limit=1000`;
+    const companiesResponse = await fetch(companiesUrl, {
+      headers: {
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${supabaseAnonKey}`,
+      },
+    });
+
+    if (!companiesResponse.ok) {
+      throw new Error(
+        `Failed to fetch companies: ${companiesResponse.status} ${companiesResponse.statusText}`
+      );
+    }
+
+    const companies = (await companiesResponse.json()) as Company[];
+
+    if (!companies || companies.length === 0) {
       return new Response(
         JSON.stringify({ matches: [] }),
         {
@@ -121,24 +150,6 @@ serve(async (req) => {
   }
 });
 
-async function fetchAllCompanies(): Promise<Company[]> {
-  const baseUrl = Deno.env.get("VITE_SUPABASE_URL");
-  const anonKey = Deno.env.get("VITE_SUPABASE_ANON_KEY");
-
-  const response = await fetch(`${baseUrl}/rest/v1/companies?limit=1000`, {
-    headers: {
-      apikey: anonKey || "",
-      Authorization: `Bearer ${anonKey || ""}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch companies: ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
 async function callLovableAI(
   userProblem: string,
   companiesText: string
@@ -165,7 +176,7 @@ Return results as JSON array with structure:
   }
 ]
 
-Return ONLY the JSON array, no other text. Match companies that address the patient's specific health concern, symptoms, or goals.`;
+Return ONLY the JSON array, no other text. Match 1-5 companies that address the patient's specific health concern, symptoms, or goals. Prioritize companies with the highest relevance.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
