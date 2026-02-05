@@ -29,17 +29,103 @@ interface Company {
   updated_at: string;
 }
 
+// Simple in-memory rate limiting (resets on function cold start)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_REQUESTS = 10; // Max requests per window
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+
+function checkRateLimit(clientIp: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(clientIp);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(clientIp, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+  
+  if (record.count >= RATE_LIMIT_REQUESTS) {
+    const retryAfter = Math.ceil((record.resetTime - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+  
+  record.count++;
+  return { allowed: true };
+}
+
+// Input validation constants
+const MIN_DESCRIPTION_LENGTH = 10;
+const MAX_DESCRIPTION_LENGTH = 1000;
+const SUSPICIOUS_PATTERNS = /<script|javascript:|on\w+=/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Rate limiting based on client IP
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("x-real-ip") || 
+                     "unknown";
+    
+    const rateCheck = checkRateLimit(clientIp);
+    if (!rateCheck.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many requests. Please try again later.",
+          retryAfter: rateCheck.retryAfter 
+        }),
+        {
+          status: 429,
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": String(rateCheck.retryAfter)
+          },
+        }
+      );
+    }
+
     const { problemDescription } = await req.json();
 
+    // Input validation
     if (!problemDescription || typeof problemDescription !== "string") {
       return new Response(
         JSON.stringify({ error: "Invalid problem description" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Sanitize and validate input
+    const cleanDescription = problemDescription.trim();
+    
+    if (cleanDescription.length < MIN_DESCRIPTION_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: "Please provide more details about your health concern (at least 10 characters)" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    if (cleanDescription.length > MAX_DESCRIPTION_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: "Description too long. Please limit to 1000 characters." }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Check for suspicious patterns (potential XSS/injection)
+    if (SUSPICIOUS_PATTERNS.test(cleanDescription)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid characters detected in your description" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -99,8 +185,8 @@ serve(async (req) => {
       return arr;
     };
 
-    // Pre-filter companies using keyword matching
-    const keywords = problemDescription.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    // Pre-filter companies using keyword matching (use cleaned description)
+    const keywords = cleanDescription.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     
     const scoredCompanies = companies.map(c => {
       const searchText = `${c.name} ${c.category} ${c.problem || ''} ${c.solution || ''} ${c.mission || ''}`.toLowerCase();
@@ -173,8 +259,8 @@ serve(async (req) => {
       )
       .join("\n---\n");
 
-    // Call Lovable AI to match problems (with pre-filtered candidates)
-    const aiResponse = await callLovableAI(problemDescription, companiesText);
+    // Call Lovable AI to match problems (with pre-filtered candidates and sanitized input)
+    const aiResponse = await callLovableAI(cleanDescription, companiesText);
 
     // Parse the AI response to get matched companies
     const matches = parseAIResponse(aiResponse, topCandidates);
