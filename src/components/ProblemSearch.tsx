@@ -8,9 +8,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Company, categoryLabels, categoryColors } from '@/types/company';
 import { supabase } from '@/integrations/supabase/client';
 
+interface MatchFactor {
+  type: string;
+  description: string;
+}
+
 interface MatchedCompany extends Company {
   relevanceScore: number;
-  matchReason: string;
+  matchFactors: MatchFactor[];
 }
 
 export function ProblemSearch() {
@@ -136,6 +141,29 @@ export function ProblemSearch() {
                         </div>
                       </div>
 
+                      {/* Match Factors - Why This Matches */}
+                      {company.matchFactors && company.matchFactors.length > 0 && (
+                        <div className="bg-muted/50 rounded-lg p-4">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                            Why this matches
+                          </p>
+                          <div className="space-y-2">
+                            {company.matchFactors.map((factor, idx) => (
+                              <div key={idx} className="flex items-start gap-2">
+                                <Badge 
+                                  variant="outline" 
+                                  className="shrink-0 text-[10px] capitalize border-accent/30 text-accent"
+                                >
+                                  {factor.type.replace(/_/g, ' ')}
+                                </Badge>
+                                <span className="text-sm text-foreground/80">{factor.description}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {company.mission && (
                         <div>
                           <p className="text-xs font-medium text-muted-foreground uppercase mb-1">
@@ -164,7 +192,7 @@ export function ProblemSearch() {
                           <div className="flex items-center gap-2">
                             <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all"
+                                className="h-full bg-gradient-to-r from-accent to-accent/70 transition-all"
                                 style={{ width: `${Math.round(company.relevanceScore * 100)}%` }}
                               />
                             </div>
@@ -178,7 +206,7 @@ export function ProblemSearch() {
                             href={company.website_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm font-medium text-primary hover:underline"
+                            className="text-sm font-medium text-accent hover:underline"
                           >
                             Learn more →
                           </a>

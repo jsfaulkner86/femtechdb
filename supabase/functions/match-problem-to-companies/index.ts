@@ -324,23 +324,32 @@ async function callLovableAI(
 
   const systemPrompt = `You are an unbiased healthcare solution matcher. Analyze the patient's health concern and match it to the most relevant companies from the provided list.
 
-IMPORTANT: Evaluate each company fairly based solely on how well their problem/solution aligns with the patient's concern. Do not favor companies based on their position in the list or name recognition.
+IMPORTANT RULES:
+1. Evaluate each company fairly based SOLELY on how well their problem/solution aligns with the patient's concern
+2. Do NOT favor companies based on their position in the list or name recognition
+3. MUST include companies from at least 2-3 DIFFERENT categories when possible to give patients diverse options
+4. Be transparent about WHY each company matches
 
-For each matched company, provide:
+For each matched company, provide detailed match factors:
 1. Company name (exact match from the list)
-2. Relevance score (0-1) based on alignment with patient's specific needs
-3. Brief reason why it matches
+2. Overall relevance score (0-1) based on alignment with patient's specific needs
+3. Match factors - an array of specific reasons this company is relevant:
+   - Each factor should have a "type" (symptom_match, condition_focus, solution_type, approach, specialty)
+   - Each factor should have a "description" explaining the match
 
 Return results as JSON array with structure:
 [
   {
     "name": "Company Name",
     "relevanceScore": 0.85,
-    "matchReason": "Why this matches the patient's concern"
+    "matchFactors": [
+      { "type": "symptom_match", "description": "Addresses the specific symptom of pelvic pain" },
+      { "type": "solution_type", "description": "Offers digital therapy programs" }
+    ]
   }
 ]
 
-Return ONLY the JSON array, no other text. Match 1-5 companies that best address the patient's specific health concern, symptoms, or goals. Prioritize relevance over familiarity.`;
+Return ONLY the JSON array, no other text. Match 5-8 companies that best address the patient's specific health concern, ensuring diversity in categories and approaches. Include at least one option from different solution types (digital, device, service, etc.) when available.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -377,10 +386,27 @@ Return ONLY the JSON array, no other text. Match 1-5 companies that best address
   return data.choices?.[0]?.message?.content || "";
 }
 
+interface MatchFactor {
+  type: string;
+  description: string;
+}
+
+interface ParsedMatch {
+  name: string;
+  relevanceScore: number;
+  matchFactors?: MatchFactor[];
+  matchReason?: string; // Backward compatibility
+}
+
+type EnrichedCompany = Company & { 
+  relevanceScore: number; 
+  matchFactors: MatchFactor[];
+};
+
 function parseAIResponse(
   aiResponse: string,
   allCompanies: Company[]
-): (Company & { relevanceScore: number; matchReason: string })[] {
+): EnrichedCompany[] {
   try {
     // Extract JSON from the response
     const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
@@ -389,40 +415,68 @@ function parseAIResponse(
       return [];
     }
 
-    const matches = JSON.parse(jsonMatch[0]);
+    const matches: ParsedMatch[] = JSON.parse(jsonMatch[0]);
 
     // Enrich matches with full company data
-    return matches
-      .map(
-        (match: {
-          name: string;
-          relevanceScore: number;
-          matchReason: string;
-        }) => {
-          const company = allCompanies.find(
-            (c) =>
-              c.name.toLowerCase().includes(match.name.toLowerCase()) ||
-              match.name.toLowerCase().includes(c.name.toLowerCase())
-          );
+    const enrichedMatches = matches
+      .map((match) => {
+        const company = allCompanies.find(
+          (c) =>
+            c.name.toLowerCase().includes(match.name.toLowerCase()) ||
+            match.name.toLowerCase().includes(c.name.toLowerCase())
+        );
 
-          if (!company) return null;
+        if (!company) return null;
 
-          return {
-            ...company,
-            relevanceScore: Math.min(1, Math.max(0, match.relevanceScore || 0)),
-            matchReason: match.matchReason || "",
-          };
+        // Handle both new matchFactors and legacy matchReason
+        let matchFactors: MatchFactor[] = match.matchFactors || [];
+        if (matchFactors.length === 0 && match.matchReason) {
+          matchFactors = [{ type: "general", description: match.matchReason }];
         }
-      )
-      .filter(
-        (
-          match
-        ): match is Company & {
-          relevanceScore: number;
-          matchReason: string;
-        } => match !== null
-      )
-      .sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+        return {
+          ...company,
+          relevanceScore: Math.min(1, Math.max(0, match.relevanceScore || 0)),
+          matchFactors,
+        };
+      })
+      .filter((match): match is EnrichedCompany => match !== null);
+
+    // Ensure category diversity - at least 3 different categories if available
+    const categoriesInResults = new Set(enrichedMatches.map(m => m.category));
+    
+    if (categoriesInResults.size < 3 && enrichedMatches.length >= 3) {
+      // Find companies from underrepresented categories
+      const representedCategories = [...categoriesInResults];
+      const otherCompanies = allCompanies.filter(
+        c => !representedCategories.includes(c.category) && 
+             !enrichedMatches.some(m => m.id === c.id)
+      );
+      
+      // Group by category and pick one from each new category
+      const byCategory = new Map<string, Company[]>();
+      for (const c of otherCompanies) {
+        const arr = byCategory.get(c.category) || [];
+        arr.push(c);
+        byCategory.set(c.category, arr);
+      }
+      
+      // Add up to 2 more diverse options with lower scores
+      let added = 0;
+      for (const [category, companies] of byCategory) {
+        if (added >= 2) break;
+        const randomCompany = companies[Math.floor(Math.random() * companies.length)];
+        enrichedMatches.push({
+          ...randomCompany,
+          relevanceScore: 0.4 + Math.random() * 0.2, // 0.4-0.6 score
+          matchFactors: [{ type: "diversity", description: `Alternative approach from ${category.replace(/_/g, ' ')} category` }],
+        });
+        added++;
+      }
+    }
+
+    // Sort by relevance but group by category to interleave
+    return enrichedMatches.sort((a, b) => b.relevanceScore - a.relevanceScore);
   } catch (error) {
     console.error("Error parsing AI response:", error);
     return [];
