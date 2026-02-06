@@ -206,8 +206,8 @@ serve(async (req) => {
     const candidatePool: Company[] = [];
     const seenIds = new Set<string>();
 
-    // Add high relevance matches (shuffled)
-    for (const c of highRelevance.slice(0, 25)) {
+    // Add high relevance matches (shuffled) - reduced for speed
+    for (const c of highRelevance.slice(0, 15)) {
       if (!seenIds.has(c.id)) {
         candidatePool.push(c);
         seenIds.add(c.id);
@@ -215,7 +215,7 @@ serve(async (req) => {
     }
 
     // Add medium relevance matches (shuffled)
-    for (const c of mediumRelevance.slice(0, 15)) {
+    for (const c of mediumRelevance.slice(0, 8)) {
       if (!seenIds.has(c.id)) {
         candidatePool.push(c);
         seenIds.add(c.id);
@@ -227,10 +227,10 @@ serve(async (req) => {
     const shuffledCategories = shuffle(categories);
     
     for (const category of shuffledCategories) {
-      if (candidatePool.length >= 50) break;
+      if (candidatePool.length >= 25) break; // Reduced from 50 to 25 for faster AI processing
       const categoryCompanies = shuffle(companies.filter(c => c.category === category && !seenIds.has(c.id)));
-      for (const c of categoryCompanies.slice(0, 3)) {
-        if (!seenIds.has(c.id) && candidatePool.length < 50) {
+      for (const c of categoryCompanies.slice(0, 2)) {
+        if (!seenIds.has(c.id) && candidatePool.length < 25) {
           candidatePool.push(c);
           seenIds.add(c.id);
         }
@@ -238,9 +238,9 @@ serve(async (req) => {
     }
 
     // Fill remaining slots with random companies if needed
-    if (candidatePool.length < 30) {
+    if (candidatePool.length < 20) {
       const remaining = shuffle(lowRelevance.filter(c => !seenIds.has(c.id)));
-      for (const c of remaining.slice(0, 30 - candidatePool.length)) {
+      for (const c of remaining.slice(0, 20 - candidatePool.length)) {
         candidatePool.push(c);
         seenIds.add(c.id);
       }
@@ -358,7 +358,7 @@ Return ONLY the JSON array, no other text. Match 5-8 companies that best address
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
+      model: "google/gemini-2.5-flash-lite", // Fastest model for quick responses
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -366,8 +366,8 @@ Return ONLY the JSON array, no other text. Match 5-8 companies that best address
           content: `Patient's health concern: "${userProblem}"\n\nAvailable companies:\n${companiesText}`,
         },
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      temperature: 0.5, // Lower temperature for faster, more deterministic responses
+      max_tokens: 1200,
     }),
   });
 
