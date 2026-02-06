@@ -86,7 +86,7 @@ export function ProblemSearch() {
           <Button 
             onClick={handleSearch} 
             disabled={isLoading}
-            className="w-full h-12 text-base font-medium"
+            className="w-full h-12 text-base font-medium bg-accent hover:bg-accent/90 text-accent-foreground"
           >
             {isLoading ? (
               <>
