@@ -358,7 +358,7 @@ Return ONLY the JSON array, no other text. Match 5-8 companies that best address
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash-lite", // Fastest model for quick responses
+      model: "google/gemini-2.5-flash", // Balanced: fast but more reliable JSON than flash-lite
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -366,8 +366,8 @@ Return ONLY the JSON array, no other text. Match 5-8 companies that best address
           content: `Patient's health concern: "${userProblem}"\n\nAvailable companies:\n${companiesText}`,
         },
       ],
-      temperature: 0.5, // Lower temperature for faster, more deterministic responses
-      max_tokens: 1200,
+      temperature: 0.3, // Lower temperature for more consistent JSON output
+      max_tokens: 1500,
     }),
   });
 
@@ -409,13 +409,38 @@ function parseAIResponse(
 ): EnrichedCompany[] {
   try {
     // Extract JSON from the response
-    const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
+    let jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       console.warn("No JSON found in AI response");
       return [];
     }
 
-    const matches: ParsedMatch[] = JSON.parse(jsonMatch[0]);
+    let jsonStr = jsonMatch[0];
+    
+    // Try to fix common JSON issues from AI responses
+    // 1. Try parsing as-is first
+    let matches: ParsedMatch[];
+    try {
+      matches = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.warn("Initial JSON parse failed, attempting to fix...");
+      
+      // 2. Try to extract just complete objects
+      const objectMatches = jsonStr.match(/\{[^{}]*"name"[^{}]*\}/g);
+      if (objectMatches && objectMatches.length > 0) {
+        const fixedJson = `[${objectMatches.join(',')}]`;
+        try {
+          matches = JSON.parse(fixedJson);
+          console.log(`Recovered ${matches.length} matches from malformed JSON`);
+        } catch {
+          console.error("Could not recover JSON, returning empty");
+          return [];
+        }
+      } else {
+        console.error("No recoverable objects in JSON");
+        return [];
+      }
+    }
 
     // Enrich matches with full company data
     const enrichedMatches = matches
