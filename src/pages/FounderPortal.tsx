@@ -96,9 +96,9 @@ export default function FounderPortal() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setShowAuthDialog(true)} size="lg" className="bg-primary hover:bg-primary/90">
-                  Sign in or Create Account
-                </Button>
+                <Button onClick={() => setShowAuthDialog(true)} size="lg" className="bg-accent hover:bg-accent/90">
+                   Sign in or Create Account
+                 </Button>
               </CardContent>
             </Card>
           ) : (
