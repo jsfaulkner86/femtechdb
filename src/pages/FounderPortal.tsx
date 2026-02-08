@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, CheckCircle2, Clock, XCircle, LogOut, Plus } from 'lucide-react';
+import { Building2, CheckCircle2, Clock, XCircle, LogOut, Plus, Search } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AuthDialog } from '@/components/auth/AuthDialog';
 import { ClaimCompanyDialog } from '@/components/founder/ClaimCompanyDialog';
+import { CreateCompanyDialog } from '@/components/founder/CreateCompanyDialog';
 import { EditCompanyForm } from '@/components/founder/EditCompanyForm';
 import { useAuth } from '@/hooks/useAuth';
 import { useFounderClaims, useClaimedCompany } from '@/hooks/useFounderClaims';
@@ -21,6 +22,7 @@ const statusConfig = {
 export default function FounderPortal() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showClaimDialog, setShowClaimDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const { user, loading: authLoading, signOut } = useAuth();
   
   const { data: claims = [], isLoading: claimsLoading } = useFounderClaims(user?.id);
@@ -94,7 +96,7 @@ export default function FounderPortal() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setShowAuthDialog(true)} size="lg">
+                <Button onClick={() => setShowAuthDialog(true)} size="lg" className="bg-primary hover:bg-primary/90">
                   Sign in or Create Account
                 </Button>
               </CardContent>
@@ -153,24 +155,40 @@ export default function FounderPortal() {
                   </CardContent>
                 </Card>
               ) : (
-                /* No Claimed Company */
+              /* No Claimed Company */
                 <div className="space-y-6">
-                  {/* Claim Button */}
-                  <Card className="text-center">
-                    <CardHeader>
-                      <CardTitle>Claim Your Company</CardTitle>
-                      <CardDescription>
-                        Find your company in our database and verify your ownership.
-                        Use your company email for instant verification.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button onClick={() => setShowClaimDialog(true)} size="lg">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Claim a Company
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  {/* Create or Claim Options */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Card className="text-center">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Create New Profile</CardTitle>
+                        <CardDescription>
+                          Add your company to the FemtechDB directory
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button onClick={() => setShowCreateDialog(true)} className="w-full bg-primary hover:bg-primary/90">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Create Company
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="text-center">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Claim Existing</CardTitle>
+                        <CardDescription>
+                          Find and claim your company if it's already listed
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button onClick={() => setShowClaimDialog(true)} variant="outline" className="w-full">
+                          <Search className="mr-2 h-4 w-4" />
+                          Search & Claim
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
 
                   {/* Pending Claims */}
                   {claims.length > 0 && (
@@ -219,6 +237,7 @@ export default function FounderPortal() {
 
       <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       <ClaimCompanyDialog open={showClaimDialog} onOpenChange={setShowClaimDialog} />
+      <CreateCompanyDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
     </div>
   );
 }

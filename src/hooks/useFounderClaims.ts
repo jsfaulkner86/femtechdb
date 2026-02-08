@@ -144,3 +144,69 @@ export function useUpdateCompany() {
     },
   });
 }
+
+interface CreateCompanyData {
+  name: string;
+  website_url: string;
+  logo_url: string | null;
+  headquarters: string | null;
+  founded_year: number | null;
+  categories: FemtechCategory[];
+  mission: string | null;
+  problem: string | null;
+  solution: string | null;
+}
+
+export function useCreateCompany() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateCompanyData) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const primaryCategory = data.categories[0] || 'other';
+
+      // Create the company with claimed_by set to the current user
+      const { data: company, error } = await supabase
+        .from('companies')
+        .insert({
+          name: data.name,
+          website_url: data.website_url,
+          logo_url: data.logo_url,
+          headquarters: data.headquarters,
+          founded_year: data.founded_year,
+          category: primaryCategory,
+          mission: data.mission,
+          problem: data.problem,
+          solution: data.solution,
+          claimed_by: user.id,
+          is_verified: false,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Insert categories into junction table
+      if (data.categories.length > 0) {
+        const { error: categoryError } = await supabase
+          .from('company_categories')
+          .insert(data.categories.map(cat => ({
+            company_id: company.id,
+            category: cat
+          })));
+
+        if (categoryError) {
+          console.error('Failed to insert categories:', categoryError);
+        }
+      }
+
+      return company as Company;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['claimed-company'] });
+    },
+  });
+}
