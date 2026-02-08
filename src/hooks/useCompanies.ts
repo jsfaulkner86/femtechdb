@@ -30,9 +30,9 @@ export function useCompanies({ search, category, continent, country, state }: Us
           return [];
         }
 
-        // Build main query with company ID filter
+        // Build main query with company ID filter - use companies_public view to avoid exposing claimed_by
         let query = supabase
-          .from('companies')
+          .from('companies_public')
           .select('*')
           .in('id', companyIds)
           .order('name');
@@ -64,9 +64,9 @@ export function useCompanies({ search, category, continent, country, state }: Us
         })) as Company[];
       }
 
-      // No category filter - fetch all companies
+      // No category filter - fetch all companies - use companies_public view to avoid exposing claimed_by
       let query = supabase
-        .from('companies')
+        .from('companies_public')
         .select('*')
         .order('name');
 
@@ -102,8 +102,9 @@ export function useCompany(id: string) {
   return useQuery({
     queryKey: ['company', id],
     queryFn: async () => {
+      // Use companies_public view to avoid exposing claimed_by
       const { data, error } = await supabase
-        .from('companies')
+        .from('companies_public')
         .select('*')
         .eq('id', id)
         .maybeSingle();
@@ -134,9 +135,9 @@ export function useCompanyCount() {
     queryKey: ['companies-count'],
     queryFn: async () => {
       // Count companies that don't have 'conferences' as their ONLY category
-      // First get all companies
+      // First get all companies - use companies_public view
       const { data: allCompanies, error: companyError } = await supabase
-        .from('companies')
+        .from('companies_public')
         .select('id');
 
       if (companyError) throw companyError;
