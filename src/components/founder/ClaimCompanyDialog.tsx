@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +22,7 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useCompanies } from '@/hooks/useCompanies';
+import { useUnclaimedCompanies } from '@/hooks/useUnclaimedCompanies';
 import { useSubmitClaim } from '@/hooks/useFounderClaims';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -44,7 +44,8 @@ export function ClaimCompanyDialog({ open, onOpenChange }: ClaimCompanyDialogPro
   const [search, setSearch] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const { user } = useAuth();
-  const { data: companies = [] } = useCompanies({ search });
+  // Use the secure hook that doesn't expose claimed_by field
+  const { data: availableCompanies = [] } = useUnclaimedCompanies(search);
   const submitClaim = useSubmitClaim();
 
   const form = useForm<ClaimFormData>({
@@ -54,12 +55,6 @@ export function ClaimCompanyDialog({ open, onOpenChange }: ClaimCompanyDialogPro
       email: user?.email || '',
     },
   });
-
-  // Filter out already claimed companies
-  const availableCompanies = useMemo(() => 
-    companies.filter(c => !c.claimed_by),
-    [companies]
-  );
 
   const handleSelectCompany = (company: Company) => {
     setSelectedCompany(company);
