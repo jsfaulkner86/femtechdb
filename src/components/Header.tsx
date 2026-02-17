@@ -9,6 +9,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const navLinks = [
   { to: '/', label: 'Directory' },
@@ -22,6 +24,7 @@ const navLinks = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
@@ -48,9 +51,10 @@ export function Header() {
               }`}
             >
               {link.icon && <link.icon className="h-3.5 w-3.5" />}
-              {link.label}
+              {t(link.label)}
             </Link>
           ))}
+          <LanguageSwitcher />
         </nav>
 
         {/* Mobile Navigation */}
@@ -72,6 +76,9 @@ export function Header() {
               </SheetTitle>
             </SheetHeader>
             <nav className="mt-8 flex flex-col gap-2">
+              <div className="px-3 pb-3 border-b border-border/50">
+                <LanguageSwitcher />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -84,7 +91,7 @@ export function Header() {
                   }`}
                 >
                   {link.icon && <link.icon className="h-5 w-5" />}
-                  {link.label}
+                  {t(link.label)}
                 </Link>
               ))}
             </nav>

@@ -2,6 +2,7 @@ import { Company } from '@/types/company';
 import { CompanyCard } from './CompanyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CompanyGridProps {
   companies: Company[] | undefined;
@@ -10,6 +11,7 @@ interface CompanyGridProps {
 }
 
 export function CompanyGrid({ companies, isLoading, onCompanyClick }: CompanyGridProps) {
+  const { t } = useLanguage();
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -39,9 +41,9 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick }: CompanyGri
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
             <Search className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">No companies found</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">{t('No companies found')}</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Try adjusting your search or filter to find what you're looking for.
+            {t('Try adjusting your search or filter to find what you\'re looking for.')}
           </p>
         </div>
       </div>
@@ -52,7 +54,7 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick }: CompanyGri
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{companies.length}</span> companies
+          {t('Showing')} <span className="font-medium text-foreground">{companies.length}</span> {t('companies')}
         </p>
       </div>
       

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { FemtechCategory, categoryLabels } from '@/types/company';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Baby, 
   Heart, 
@@ -102,6 +103,7 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
+  const { t } = useLanguage();
   const categories: (FemtechCategory | 'all')[] = [
     'all',
     'fertility',
@@ -157,7 +159,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
                 `}
               >
                 <Icon className={`mr-2 h-4 w-4 ${isSelected ? 'text-foreground' : iconColor}`} />
-                {category === 'all' ? 'All Categories' : categoryLabels[category]}
+                {category === 'all' ? t('All Categories') : t(categoryLabels[category])}
               </Button>
             );
           })}
