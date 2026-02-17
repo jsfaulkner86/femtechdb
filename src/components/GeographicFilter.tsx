@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Globe, MapPin, X } from 'lucide-react';
 import { continents, usStates, type Continent } from '@/types/company';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Common countries per continent
 const countriesByContinent: Record<Continent, string[]> = {
@@ -31,6 +32,7 @@ interface GeographicFilterProps {
 }
 
 export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterProps) {
+  const { t } = useLanguage();
   const availableCountries = filters.continent 
     ? countriesByContinent[filters.continent as Continent] || []
     : [];
@@ -73,7 +75,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
         <div className="flex flex-wrap items-center justify-center gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Globe className="h-4 w-4" />
-            <span>Filter by location:</span>
+            <span>{t('Filter by location')}:</span>
           </div>
 
           {/* Continent Select */}
@@ -85,7 +87,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
               <SelectValue placeholder="Continent" />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
-              <SelectItem value="all">All Continents</SelectItem>
+              <SelectItem value="all">{t('All Continents')}</SelectItem>
               {continents.map((continent) => (
                 <SelectItem key={continent} value={continent}>
                   {continent}
@@ -104,7 +106,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
                 <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50">
-                <SelectItem value="all">All Countries</SelectItem>
+                <SelectItem value="all">{t('All Countries')}</SelectItem>
                 {availableCountries.map((country) => (
                   <SelectItem key={country} value={country}>
                     {country}
@@ -124,7 +126,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50 max-h-[300px]">
-                <SelectItem value="all">All States</SelectItem>
+                <SelectItem value="all">{t('All States')}</SelectItem>
                 {usStates.map((state) => (
                   <SelectItem key={state} value={state}>
                     {state}
@@ -143,7 +145,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
               className="gap-1 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
-              Clear
+              {t('Clear')}
             </Button>
           )}
         </div>
@@ -153,7 +155,7 @@ export function GeographicFilter({ filters, onFiltersChange }: GeographicFilterP
           <div className="mt-3 flex items-center justify-center gap-2 text-sm">
             <MapPin className="h-4 w-4 text-sage" />
             <span className="text-muted-foreground">
-              Showing companies in:{' '}
+              {t('Showing companies in')}:{' '}
               <span className="font-medium text-foreground">
                 {[filters.state, filters.country, filters.continent]
                   .filter(Boolean)

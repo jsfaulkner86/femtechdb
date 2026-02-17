@@ -7,12 +7,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { categoryLabels, categoryColors, type Company } from '@/types/company';
 import { CompletenessIndicator } from './CompletenessIndicator';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeaturedCompaniesProps {
   onCompanyClick: (company: Company) => void;
 }
 
 export function FeaturedCompanies({ onCompanyClick }: FeaturedCompaniesProps) {
+  const { t } = useLanguage();
   const { data: featuredCompanies, isLoading } = useQuery({
     queryKey: ['featured-companies'],
     queryFn: async () => {
@@ -39,7 +41,7 @@ export function FeaturedCompanies({ onCompanyClick }: FeaturedCompaniesProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 mb-6">
             <Star className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-xl font-semibold">Featured Companies</h2>
+            <h2 className="font-display text-xl font-semibold">{t('Featured Companies')}</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -62,8 +64,8 @@ export function FeaturedCompanies({ onCompanyClick }: FeaturedCompaniesProps) {
               <Star className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <h2 className="font-display text-xl font-semibold">Featured Companies</h2>
-              <p className="text-sm text-muted-foreground">Verified & recently updated</p>
+              <h2 className="font-display text-xl font-semibold">{t('Featured Companies')}</h2>
+              <p className="text-sm text-muted-foreground">{t('Verified & recently updated')}</p>
             </div>
           </div>
         </div>
@@ -93,7 +95,7 @@ export function FeaturedCompanies({ onCompanyClick }: FeaturedCompaniesProps) {
 
                 {company.mission && (
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {company.mission}
+                    {t(company.mission)}
                   </p>
                 )}
 

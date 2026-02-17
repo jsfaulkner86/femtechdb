@@ -2,3 +2,6 @@ project_id = "hkmmytwlgdxlhadlskiv"
 
 [functions.match-problem-to-companies]
 verify_jwt = false
+
+[functions.translate]
+verify_jwt = false

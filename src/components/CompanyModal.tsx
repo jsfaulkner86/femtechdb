@@ -8,6 +8,7 @@ import { Company, categoryLabels, categoryColors } from '@/types/company';
 import { SafeLink } from './SafeLink';
 import { isValidHttpUrl } from '@/lib/url';
 import { formatDistanceToNow, format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 interface CompanyModalProps {
   company: Company | null;
   isOpen: boolean;
@@ -16,7 +17,7 @@ interface CompanyModalProps {
 
 export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
   if (!company) return null;
-
+  const { t } = useLanguage();
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -33,9 +34,9 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
                       <BadgeCheck className="h-5 w-5 text-sage cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
-                      <p className="font-medium">Verified Company</p>
+                      <p className="font-medium">{t('Verified Company')}</p>
                       <p className="text-xs text-muted-foreground">
-                        This company has been independently verified by our team.
+                        {t('This company has been independently verified by our team.')}
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -58,10 +59,10 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
           {company.mission && (
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                Mission
+                {t('Mission')}
               </h4>
               <p className="text-muted-foreground leading-relaxed">
-                {company.mission}
+                {t(company.mission)}
               </p>
             </div>
           )}
@@ -75,11 +76,11 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
                 <div className="flex items-center gap-2 text-destructive/80">
                   <Target className="h-4 w-4" />
                   <h4 className="text-sm font-semibold uppercase tracking-wide">
-                    Problem
+                    {t('Problem')}
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {company.problem}
+                  {t(company.problem)}
                 </p>
               </div>
             )}
@@ -89,11 +90,11 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
                 <div className="flex items-center gap-2 text-sage">
                   <Lightbulb className="h-4 w-4" />
                   <h4 className="text-sm font-semibold uppercase tracking-wide">
-                    Solution
+                    {t('Solution')}
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {company.solution}
+                  {t(company.solution)}
                 </p>
               </div>
             )}
@@ -112,7 +113,7 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
             {company.founded_year && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="h-4 w-4 text-primary" />
-                <span>Founded {company.founded_year}</span>
+                <span>{t('Founded')} {company.founded_year}</span>
               </div>
             )}
           </div>
@@ -122,7 +123,7 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-muted/50 rounded-lg px-3 py-2">
               <Clock className="h-3.5 w-3.5" />
               <span>
-                Last updated {formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}
+                {t('Last updated')} {formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}
                 <span className="mx-1">•</span>
                 {format(new Date(company.updated_at), 'MMM d, yyyy')}
               </span>
@@ -134,7 +135,7 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
             <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                 <Link2 className="h-3.5 w-3.5" />
-                <span className="font-medium">Source</span>
+                <span className="font-medium">{t('Source')}</span>
               </div>
               <SafeLink 
                 href={company.source_url}
@@ -154,7 +155,7 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
             >
               <SafeLink href={company.website_url}>
                 <ExternalLink className="mr-2 h-4 w-4" />
-                Visit Website
+                {t('Visit Website')}
               </SafeLink>
             </Button>
           )}

@@ -8,6 +8,7 @@ import { Company, categoryLabels, categoryColors, commercializationPhaseLabels }
 import { CompletenessIndicator } from './CompletenessIndicator';
 import { SafeLink } from './SafeLink';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CompanyCardProps {
   company: Company;
@@ -16,6 +17,7 @@ interface CompanyCardProps {
 
 export function CompanyCard({ company, onClick }: CompanyCardProps) {
   const [logoError, setLogoError] = useState(false);
+  const { t } = useLanguage();
   
   const getInitials = (name: string) => {
     return name.split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
@@ -41,10 +43,10 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
                     <BadgeCheck className="h-5 w-5 text-sage flex-shrink-0 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
-                    <p className="font-medium">Verified Company</p>
-                    <p className="text-xs text-muted-foreground">
-                      This company has been independently verified by our team.
-                    </p>
+                     <p className="font-medium">{t('Verified Company')}</p>
+                     <p className="text-xs text-muted-foreground">
+                       {t('This company has been independently verified by our team.')}
+                     </p>
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -102,24 +104,20 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
       </CardHeader>
 
       <CardContent className="relative space-y-4">
-        {company.mission && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {company.mission}
-          </p>
-        )}
+        {company.mission && <p className="text-sm text-muted-foreground line-clamp-2">{t(company.mission)}</p>}
 
         <div className="space-y-2">
           {company.problem && (
             <div className="text-sm">
-              <span className="font-medium text-destructive/80">Problem: </span>
-              <span className="text-muted-foreground line-clamp-1">{company.problem}</span>
+              <span className="font-medium text-destructive/80">{t('Problem')}: </span>
+              <span className="text-muted-foreground line-clamp-1">{t(company.problem)}</span>
             </div>
           )}
           
           {company.solution && (
             <div className="text-sm">
-              <span className="font-medium text-sage">Solution: </span>
-              <span className="text-muted-foreground line-clamp-1">{company.solution}</span>
+              <span className="font-medium text-sage">{t('Solution')}: </span>
+              <span className="text-muted-foreground line-clamp-1">{t(company.solution)}</span>
             </div>
           )}
         </div>

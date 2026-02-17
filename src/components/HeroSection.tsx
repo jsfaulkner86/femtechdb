@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCompanyCount } from '@/hooks/useCompanies';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HeroSectionProps {
   searchQuery: string;
@@ -15,6 +16,7 @@ export const HeroSection = memo(function HeroSection({
   // Local state for immediate input responsiveness
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const { data: companyCount } = useCompanyCount();
+  const { t } = useLanguage();
 
   // Sync local state when parent searchQuery changes (e.g., on clear)
   useEffect(() => {
@@ -45,23 +47,23 @@ export const HeroSection = memo(function HeroSection({
       <div className="container relative z-10 mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-block mb-4 px-4 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-full animate-fade-in">
-            Discover Women's Health Innovation
+            {t('Discover Women\'s Health Innovation')}
           </span>
           
           <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl animate-fade-in" style={{
           animationDelay: '0.1s'
         }}>
-            The Global{' '}
-            <span className="text-gradient">Femtech</span>
-            {' '}Directory
+            {t('The Global')}{' '}
+            <span className="text-gradient">{t('Femtech')}</span>
+            {' '}{t('Directory')}
           </h1>
           
           <p className="mt-6 text-lg text-muted-foreground md:text-xl animate-fade-in" style={{
           animationDelay: '0.2s'
         }}>
-            Explore innovative companies transforming women's health.
+            {t('Explore innovative companies transforming women\'s health.')}
             <br />
-            Find solutions for fertility, pregnancy, menopause, and beyond.
+            {t('Find solutions for fertility, pregnancy, menopause, and beyond.')}
           </p>
 
           {/* Search Bar */}
@@ -70,7 +72,7 @@ export const HeroSection = memo(function HeroSection({
         }}>
             <div className="relative mx-auto max-w-xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input type="search" placeholder="Search companies, solutions, health areas..." value={localSearch} onChange={e => setLocalSearch(e.target.value)} className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300" />
+              <Input type="search" placeholder={t('Search companies, solutions, health areas...')} value={localSearch} onChange={e => setLocalSearch(e.target.value)} className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border bg-card shadow-md focus:border-primary focus:shadow-glow transition-all duration-300" />
             </div>
           </div>
 
@@ -82,17 +84,17 @@ export const HeroSection = memo(function HeroSection({
               <span className="block text-2xl font-bold text-foreground">
                 {companyCount !== undefined ? `${companyCount}+` : '...'}
               </span>
-              <span className="text-muted-foreground">Companies</span>
+              <span className="text-muted-foreground">{t('Companies')}</span>
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
               <span className="block text-2xl font-bold text-foreground">27</span>
-              <span className="text-muted-foreground">Categories</span>
+              <span className="text-muted-foreground">{t('Categories')}</span>
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
-              <span className="block text-2xl font-bold text-foreground">Daily</span>
-              <span className="text-muted-foreground">Updates</span>
+              <span className="block text-2xl font-bold text-foreground">{t('Daily')}</span>
+              <span className="text-muted-foreground">{t('Updates')}</span>
             </div>
           </div>
         </div>
