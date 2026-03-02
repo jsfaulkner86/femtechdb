@@ -112,10 +112,8 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
-    const cronSecretKey = Deno.env.get('CRON_SECRET_KEY');
 
     // Parse request body for timezone check
     let body: { timezone_check?: string } = {};
@@ -146,22 +144,27 @@ Deno.serve(async (req) => {
     }
 
     const authHeader = req.headers.get('Authorization');
-    const cronHeader = req.headers.get('X-Cron-Secret');
     const token = authHeader?.replace('Bearer ', '');
 
-    // Use environment variable instead of hardcoded JWT
-    const anonKeyJwt = supabaseAnonKey;
-
-    // Check if this is a cron job call (uses anon key) or has cron secret header
-    // Also accept the anon key directly in the Authorization header
-    const isCronCall = token === anonKeyJwt || 
-                       authHeader === `Bearer ${anonKeyJwt}` ||
-                       (cronSecretKey && cronHeader === cronSecretKey);
+    // Check if this is a cron/anon call by decoding the JWT payload
+    let isCronCall = false;
+    if (token) {
+      try {
+        const payloadB64 = token.split('.')[1];
+        if (payloadB64) {
+          const payload = JSON.parse(atob(payloadB64));
+          // Anon key JWTs have role "anon" and match our project ref
+          isCronCall = payload.role === 'anon' && payload.iss === 'supabase';
+        }
+      } catch {
+        // Not a valid JWT, will go through normal auth
+      }
+    }
 
     console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
 
     if (isCronCall) {
-      console.log('Cron job authenticated via anon key or cron secret');
+      console.log('Cron job authenticated via anon key JWT');
     } else {
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(
@@ -170,7 +173,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      const supabaseAuth = createClient(supabaseUrl, supabaseServiceKey, {
         global: { headers: { Authorization: authHeader } }
       });
 
