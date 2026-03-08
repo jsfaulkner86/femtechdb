@@ -475,6 +475,25 @@ IMPORTANT:
 
       summary.companiesAdded = insertedData?.length || 0;
       console.log(`Successfully inserted ${summary.companiesAdded} new companies`);
+
+      // Insert into company_categories junction table
+      if (insertedData && insertedData.length > 0) {
+        const categoryEntries = insertedData.map((company: { id: string; category: string }) => ({
+          company_id: company.id,
+          category: company.category,
+        }));
+
+        const { error: catError } = await supabase
+          .from('company_categories')
+          .insert(categoryEntries);
+
+        if (catError) {
+          console.error('Failed to insert company_categories:', catError.message);
+          summary.errors.push(`Category insert error: ${catError.message}`);
+        } else {
+          console.log(`Inserted ${categoryEntries.length} company_categories entries`);
+        }
+      }
     }
 
     // Calculate end time and duration
