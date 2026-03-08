@@ -32,7 +32,16 @@ export function Footer() {
               <Link to="/terms" className="hover:text-foreground transition-colors">{t('Terms of Service')}</Link>
             </nav>
             <p className="text-xs text-muted-foreground">
-              {t('Updated daily')} • {new Date().getFullYear()}
+              {t('Created by')}{' '}
+              <a 
+                href="https://thefaulknergroupadvisors.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:text-primary transition-colors"
+              >
+                The Faulkner Group
+              </a>
+              {' '}• {t('Updated daily')} • {new Date().getFullYear()}
             </p>
           </div>
         </div>
