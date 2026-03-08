@@ -9,6 +9,7 @@ import { CompanyGrid } from '@/components/CompanyGrid';
 import { CompanyModal } from '@/components/CompanyModal';
 import { FeaturedCompanies } from '@/components/FeaturedCompanies';
 import { DatabaseStats } from '@/components/DatabaseStats';
+import { AlphabetNav } from '@/components/AlphabetNav';
 import { useCompanies } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
 
@@ -19,6 +20,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<FemtechCategory | 'all'>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeLetter, setActiveLetter] = useState<string | null>(null);
   const [geoFilters, setGeoFilters] = useState<GeographicFilters>({
     continent: searchParams.get('continent'),
     country: searchParams.get('country'),
@@ -96,11 +98,18 @@ const Index = () => {
         {!hasActiveFilters && (
           <FeaturedCompanies onCompanyClick={handleCompanyClick} />
         )}
+
+        <AlphabetNav 
+          companies={companies} 
+          activeLetter={activeLetter} 
+          onLetterClick={setActiveLetter} 
+        />
         
         <CompanyGrid
           companies={companies}
           isLoading={isLoading}
           onCompanyClick={handleCompanyClick}
+          activeLetter={activeLetter}
         />
       </main>
 

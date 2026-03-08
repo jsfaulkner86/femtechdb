@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Company } from '@/types/company';
 import { CompanyCard } from './CompanyCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,10 +9,23 @@ interface CompanyGridProps {
   companies: Company[] | undefined;
   isLoading: boolean;
   onCompanyClick: (company: Company) => void;
+  activeLetter?: string | null;
 }
 
-export function CompanyGrid({ companies, isLoading, onCompanyClick }: CompanyGridProps) {
+function getLetterKey(name: string): string {
+  const first = name[0]?.toUpperCase() ?? '#';
+  return /[A-Z]/.test(first) ? first : '#';
+}
+
+export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter }: CompanyGridProps) {
   const { t } = useLanguage();
+
+  const filteredCompanies = useMemo(() => {
+    if (!companies) return [];
+    if (!activeLetter) return companies;
+    return companies.filter(c => getLetterKey(c.name) === activeLetter);
+  }, [companies, activeLetter]);
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -50,19 +64,32 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick }: CompanyGri
     );
   }
 
+  if (filteredCompanies.length === 0 && activeLetter) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            {t('No companies found')} for "{activeLetter}"
+          </h3>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {t('Showing')} <span className="font-medium text-foreground">{companies.length}</span> {t('companies')}
+          {t('Showing')} <span className="font-medium text-foreground">{filteredCompanies.length}</span>
+          {activeLetter ? ` (${activeLetter})` : ''} {t('of')} {companies.length} {t('companies')}
         </p>
       </div>
       
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {companies.map((company, index) => (
+        {filteredCompanies.map((company, index) => (
           <div 
             key={company.id} 
-            style={{ animationDelay: `${index * 0.05}s` }}
+            style={{ animationDelay: `${Math.min(index, 20) * 0.03}s` }}
           >
             <CompanyCard 
               company={company} 
