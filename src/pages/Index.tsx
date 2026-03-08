@@ -20,6 +20,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<FemtechCategory | 'all'>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeLetter, setActiveLetter] = useState<string | null>(null);
   const [geoFilters, setGeoFilters] = useState<GeographicFilters>({
     continent: searchParams.get('continent'),
     country: searchParams.get('country'),
