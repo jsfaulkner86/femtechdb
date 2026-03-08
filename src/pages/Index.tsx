@@ -98,11 +98,18 @@ const Index = () => {
         {!hasActiveFilters && (
           <FeaturedCompanies onCompanyClick={handleCompanyClick} />
         )}
+
+        <AlphabetNav 
+          companies={companies} 
+          activeLetter={activeLetter} 
+          onLetterClick={setActiveLetter} 
+        />
         
         <CompanyGrid
           companies={companies}
           isLoading={isLoading}
           onCompanyClick={handleCompanyClick}
+          activeLetter={activeLetter}
         />
       </main>
 
