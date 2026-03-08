@@ -119,7 +119,8 @@ export function useCompanyLocations() {
         .from('companies')
         .select('id, name, category, country, continent, state, headquarters, website_url, mission')
         .not('country', 'is', null)
-        .order('name');
+        .order('name')
+        .limit(5000);
 
       if (error) throw error;
 
