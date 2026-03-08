@@ -35,7 +35,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
           .from('companies_public')
           .select('*')
           .in('id', companyIds)
-          .order('name');
+          .order('name')
+          .limit(5000);
 
         if (search && search.trim()) {
           const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
@@ -53,7 +54,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
         const { data: allCategories } = await supabase
           .from('company_categories')
           .select('company_id, category')
-          .in('company_id', data?.map(c => c.id) || []);
+          .in('company_id', data?.map(c => c.id) || [])
+          .limit(10000);
 
         // Map categories to companies
         return (data || []).map(company => ({
@@ -68,7 +70,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
       let query = supabase
         .from('companies_public')
         .select('*')
-        .order('name');
+        .order('name')
+        .limit(5000);
 
       if (search && search.trim()) {
         const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
@@ -85,7 +88,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
       // Fetch all categories for these companies
       const { data: allCategories } = await supabase
         .from('company_categories')
-        .select('company_id, category');
+        .select('company_id, category')
+        .limit(10000);
 
       // Map categories to companies
       return (data || []).map(company => ({
@@ -134,27 +138,10 @@ export function useCompanyCount() {
   return useQuery({
     queryKey: ['companies-count'],
     queryFn: async () => {
-      // Count companies that don't have 'conferences' as their ONLY category
-      // First get all companies - use companies_public view
-      const { data: allCompanies, error: companyError } = await supabase
-        .from('companies_public')
-        .select('id');
-
-      if (companyError) throw companyError;
-
-      // Get companies that have at least one non-conference category
-      const { data: nonConferenceCategories, error: categoryError } = await supabase
-        .from('company_categories')
-        .select('company_id')
-        .neq('category', 'conferences');
-
-      if (categoryError) throw categoryError;
-
-      // Get unique company IDs that have non-conference categories
-      const nonConferenceCompanyIds = new Set(nonConferenceCategories?.map(c => c.company_id) || []);
-
-      return nonConferenceCompanyIds.size;
+      const { data, error } = await supabase.rpc('get_non_conference_company_count');
+      if (error) throw error;
+      return data as number;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 }

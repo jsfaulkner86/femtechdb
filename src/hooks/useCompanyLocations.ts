@@ -119,7 +119,8 @@ export function useCompanyLocations() {
         .from('companies')
         .select('id, name, category, country, continent, state, headquarters, website_url, mission')
         .not('country', 'is', null)
-        .order('name');
+        .order('name')
+        .limit(5000);
 
       if (error) throw error;
 
@@ -173,7 +174,8 @@ export function useRegionCounts() {
       const { data, error } = await supabase
         .from('companies')
         .select('continent, country')
-        .not('continent', 'is', null);
+        .not('continent', 'is', null)
+        .limit(5000);
 
       if (error) throw error;
 
