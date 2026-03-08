@@ -174,7 +174,8 @@ export function useRegionCounts() {
       const { data, error } = await supabase
         .from('companies')
         .select('continent, country')
-        .not('continent', 'is', null);
+        .not('continent', 'is', null)
+        .limit(5000);
 
       if (error) throw error;
 

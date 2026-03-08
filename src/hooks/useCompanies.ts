@@ -35,7 +35,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
           .from('companies_public')
           .select('*')
           .in('id', companyIds)
-          .order('name');
+          .order('name')
+          .limit(5000);
 
         if (search && search.trim()) {
           const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
