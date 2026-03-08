@@ -68,7 +68,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
       let query = supabase
         .from('companies_public')
         .select('*')
-        .order('name');
+        .order('name')
+        .limit(5000);
 
       if (search && search.trim()) {
         const sanitizedSearch = search.trim().slice(0, 100).replace(/[%_]/g, '\\$&');
@@ -85,7 +86,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
       // Fetch all categories for these companies
       const { data: allCategories } = await supabase
         .from('company_categories')
-        .select('company_id, category');
+        .select('company_id, category')
+        .limit(10000);
 
       // Map categories to companies
       return (data || []).map(company => ({
