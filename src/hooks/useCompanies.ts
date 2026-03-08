@@ -134,27 +134,10 @@ export function useCompanyCount() {
   return useQuery({
     queryKey: ['companies-count'],
     queryFn: async () => {
-      // Count companies that don't have 'conferences' as their ONLY category
-      // First get all companies - use companies_public view
-      const { data: allCompanies, error: companyError } = await supabase
-        .from('companies_public')
-        .select('id');
-
-      if (companyError) throw companyError;
-
-      // Get companies that have at least one non-conference category
-      const { data: nonConferenceCategories, error: categoryError } = await supabase
-        .from('company_categories')
-        .select('company_id')
-        .neq('category', 'conferences');
-
-      if (categoryError) throw categoryError;
-
-      // Get unique company IDs that have non-conference categories
-      const nonConferenceCompanyIds = new Set(nonConferenceCategories?.map(c => c.company_id) || []);
-
-      return nonConferenceCompanyIds.size;
+      const { data, error } = await supabase.rpc('get_non_conference_company_count');
+      if (error) throw error;
+      return data as number;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 }
