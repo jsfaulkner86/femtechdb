@@ -9,6 +9,7 @@ import { CompanyGrid } from '@/components/CompanyGrid';
 import { CompanyModal } from '@/components/CompanyModal';
 import { FeaturedCompanies } from '@/components/FeaturedCompanies';
 import { DatabaseStats } from '@/components/DatabaseStats';
+import { AlphabetNav } from '@/components/AlphabetNav';
 import { useCompanies } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
 
