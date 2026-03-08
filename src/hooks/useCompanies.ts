@@ -54,7 +54,8 @@ export function useCompanies({ search, category, continent, country, state }: Us
         const { data: allCategories } = await supabase
           .from('company_categories')
           .select('company_id, category')
-          .in('company_id', data?.map(c => c.id) || []);
+          .in('company_id', data?.map(c => c.id) || [])
+          .limit(10000);
 
         // Map categories to companies
         return (data || []).map(company => ({
