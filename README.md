@@ -1,73 +1,49 @@
-# Welcome to your Lovable project
+# FemTechDB
 
-## Project info
+> **TypeScript + React** — The world database of femtech companies, updated daily
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)]()
+[![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)]()
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)]()
+[![Women's Health](https://img.shields.io/badge/Women's-Health-E91E8C?style=flat-square)]()
 
-## How can I edit this code?
+## What It Is
 
-There are several ways of editing your application.
+A living, searchable database of femtech companies worldwide — updated automatically via a daily cron job. Built for researchers, investors, founders, and advisors who need a comprehensive, current view of the women's health tech landscape.
 
-**Use Lovable**
+## What It Does
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- Maintains a global directory of femtech companies with key metadata
+- Runs a daily automated update job to add new companies and refresh data
+- Provides a searchable, filterable interface for exploring the landscape
+- Built for use by The Faulkner Group advisory practice
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+| Layer | Technology |
+|---|---|
+| Frontend | React + TypeScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS |
+| Data Updates | Cron job automation |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone https://github.com/jsfaulkner86/femtechdb
+cd femtechdb
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Background
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Built by [John Faulkner](https://linkedin.com/in/johnathonfaulkner), founder of [The Faulkner Group](https://thefaulknergroupadvisors.com) — a boutique advisory firm serving women's health tech leaders.
 
-**Use GitHub Codespaces**
+## What's Next
+- Funding data and investor mapping
+- Filter by therapeutic area, stage, geography
+- API endpoint for programmatic access
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+*Part of The Faulkner Group's women's health tech toolset. See all projects at [github.com/jsfaulkner86](https://github.com/jsfaulkner86)*
