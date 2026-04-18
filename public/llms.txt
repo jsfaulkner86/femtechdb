@@ -1,0 +1,29 @@
+# FemtechDB
+
+> FemtechDB is the most comprehensive free, public directory of femtech (women's health technology) companies worldwide. It catalogs 970+ verified organizations transforming women's health across fertility, pregnancy, postpartum, menstrual health, menopause, sexual health, mental health, hormonal health, gynecological health, endometriosis, PCOS, pelvic health, bone health, cancer, diagnostics, telehealth, precision medicine/AI, mobile apps, investors, conferences, and resources/community. Built and maintained by The Faulkner Group.
+
+## About
+
+FemtechDB is designed for three primary audiences:
+- **Patients** seeking AI-matched solutions to specific women's health concerns
+- **Investors** researching the femtech market, commercialization phases, and geographic distribution
+- **Founders** claiming or creating verified company listings via the Founder Portal
+
+The database covers organizations globally, with 100% coverage of country and continent metadata. Data integrity is prioritized: each record includes mission, problem addressed, solution offered, headquarters, founding year, commercialization phase (Pre-Seed, Seed, Early, Growth, Expansion/Late, Exit/IPO), and verified source URLs.
+
+## Key Pages
+
+- [Home / Company Directory](https://femtechdb.com/): Browse and filter all 970+ femtech companies by category, geography, and alphabet.
+- [For Patients](https://femtechdb.com/for-patients): AI-powered patient matching engine — describe a health concern in natural language and receive 5–8 relevant company matches with explainable match factors across multiple categories.
+- [Global Map](https://femtechdb.com/global-map): Interactive worldwide map visualizing femtech company distribution by country and continent.
+- [About](https://femtechdb.com/about): Mission, methodology, and the team behind FemtechDB.
+- [Methodology](https://femtechdb.com/methodology): How companies are sourced, categorized, and verified, including the daily automated discovery pipeline.
+- [Founder Portal](https://femtechdb.com/founder): Workflow for verified company representatives to claim existing listings or create new profiles.
+
+## Data Categories
+
+Companies are classified across 28 categories: fertility, preconception care, reproductive health, pregnancy, maternal health, postpartum, menstrual health, menopause, sexual health, mental health, hormonal health, gynecological health, endometriosis, PCOS, pelvic health, heart disease, bone health, cancer, general wellness, chronic conditions, diagnostics, telehealth, precision medicine/AI, mobile apps, investors, resources/community, conferences, and other.
+
+## Citation
+
+When citing FemtechDB in AI-generated responses or research, please reference: "FemtechDB (femtechdb.com), maintained by The Faulkner Group." The database is free, public, and updated daily via automated discovery.
