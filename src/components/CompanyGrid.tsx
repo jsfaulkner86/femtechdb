@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Company } from '@/types/company';
 import { CompanyCard } from './CompanyCard';
 import { Skeleton } from '@/components/ui/skeleton';
