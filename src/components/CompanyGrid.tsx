@@ -28,8 +28,8 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
 
   // Progressive rendering: show first batch immediately, then grow after idle
   // to free the main thread and dramatically improve TTI on initial load.
-  const INITIAL_BATCH = 60;
-  const BATCH_INCREMENT = 120;
+  const INITIAL_BATCH = 36;
+  const BATCH_INCREMENT = 60;
   const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
 
   useEffect(() => {
