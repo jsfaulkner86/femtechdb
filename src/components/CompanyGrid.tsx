@@ -119,7 +119,7 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
       </div>
       
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredCompanies.map((company, index) => (
+        {visibleCompanies.map((company, index) => (
           <div 
             key={company.id} 
             style={{ animationDelay: `${Math.min(index, 20) * 0.03}s` }}
