@@ -15,6 +15,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   build: {
     sourcemap: true,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        passes: 2,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
