@@ -10,8 +10,9 @@ import { CompanyModal } from '@/components/CompanyModal';
 import { FeaturedCompanies } from '@/components/FeaturedCompanies';
 import { DatabaseStats } from '@/components/DatabaseStats';
 import { AlphabetNav } from '@/components/AlphabetNav';
-import { useCompanies } from '@/hooks/useCompanies';
+import { useCompanies, useCompanyCount } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
+import { useMemo } from 'react';
 
 
 const Index = () => {
@@ -48,13 +49,27 @@ const Index = () => {
     setSearchParams(params, { replace: true });
   };
 
-  const { data: companies, isLoading } = useCompanies({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCompanies({
     search: searchQuery,
     category: selectedCategory,
     continent: geoFilters.continent,
     country: geoFilters.country,
     state: geoFilters.state,
+    letter: activeLetter,
   });
+
+  const companies = useMemo(
+    () => data?.pages.flat() ?? [],
+    [data]
+  );
+
+  const { data: totalCount } = useCompanyCount();
 
   const handleCompanyClick = (company: Company) => {
     setSelectedCompany(company);
@@ -99,17 +114,20 @@ const Index = () => {
           <FeaturedCompanies onCompanyClick={handleCompanyClick} />
         )}
 
-        <AlphabetNav 
-          companies={companies} 
-          activeLetter={activeLetter} 
-          onLetterClick={setActiveLetter} 
+        <AlphabetNav
+          activeLetter={activeLetter}
+          onLetterClick={setActiveLetter}
         />
-        
+
         <CompanyGrid
           companies={companies}
           isLoading={isLoading}
           onCompanyClick={handleCompanyClick}
           activeLetter={activeLetter}
+          totalCount={totalCount}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
         />
       </main>
 
