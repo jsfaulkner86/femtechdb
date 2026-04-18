@@ -78,6 +78,10 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
                   src={company.logo_url.replace(/^http:\/\//i, 'https://')} 
                   alt={`${company.name} logo`}
                   className="h-full w-full object-contain"
+                  loading="lazy"
+                  decoding="async"
+                  width={40}
+                  height={40}
                   onError={() => setLogoError(true)}
                 />
               ) : (
