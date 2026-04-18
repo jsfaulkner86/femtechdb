@@ -1,8 +1,8 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Company } from '@/types/company';
 import { CompanyCard } from './CompanyCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CompanyGridProps {
@@ -10,54 +10,40 @@ interface CompanyGridProps {
   isLoading: boolean;
   onCompanyClick: (company: Company) => void;
   activeLetter?: string | null;
+  totalCount?: number;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 }
 
-function getLetterKey(name: string): string {
-  const first = name[0]?.toUpperCase() ?? '#';
-  return /[A-Z]/.test(first) ? first : '#';
-}
-
-export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter }: CompanyGridProps) {
+export function CompanyGrid({
+  companies,
+  isLoading,
+  onCompanyClick,
+  activeLetter,
+  totalCount,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
+}: CompanyGridProps) {
   const { t } = useLanguage();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const filteredCompanies = useMemo(() => {
-    if (!companies) return [];
-    if (!activeLetter) return companies;
-    return companies.filter(c => getLetterKey(c.name) === activeLetter);
-  }, [companies, activeLetter]);
-
-  // Progressive rendering: show first batch immediately, then grow after idle
-  // to free the main thread and dramatically improve TTI on initial load.
-  const INITIAL_BATCH = 36;
-  const BATCH_INCREMENT = 60;
-  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
-
+  // Infinite scroll: trigger fetchNextPage when sentinel becomes visible.
   useEffect(() => {
-    setVisibleCount(INITIAL_BATCH);
-  }, [activeLetter, companies]);
-
-  useEffect(() => {
-    if (visibleCount >= filteredCompanies.length) return;
-    const w = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-    };
-    const schedule = w.requestIdleCallback
-      ? (cb: () => void) => w.requestIdleCallback!(cb, { timeout: 500 })
-      : (cb: () => void) => window.setTimeout(cb, 200);
-    const id = schedule(() => {
-      setVisibleCount(c => Math.min(c + BATCH_INCREMENT, filteredCompanies.length));
-    });
-    return () => {
-      const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
-      if (cancel) cancel(id);
-      else window.clearTimeout(id);
-    };
-  }, [visibleCount, filteredCompanies.length]);
-
-  const visibleCompanies = useMemo(
-    () => filteredCompanies.slice(0, visibleCount),
-    [filteredCompanies, visibleCount]
-  );
+    if (!sentinelRef.current || !fetchNextPage || !hasNextPage) return;
+    const el = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading) {
     return (
@@ -97,40 +83,38 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
     );
   }
 
-  if (filteredCompanies.length === 0 && activeLetter) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            {t('No companies found')} for "{activeLetter}"
-          </h3>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {t('Showing')} <span className="font-medium text-foreground">{filteredCompanies.length}</span>
-          {activeLetter ? ` (${activeLetter})` : ''} {t('of')} {companies.length} {t('companies')}
+          {t('Showing')} <span className="font-medium text-foreground">{companies.length}</span>
+          {activeLetter ? ` (${activeLetter})` : ''}
+          {typeof totalCount === 'number' && !activeLetter ? ` ${t('of')} ${totalCount}` : ''} {t('companies')}
         </p>
       </div>
-      
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {visibleCompanies.map((company, index) => (
-          <div 
-            key={company.id} 
+        {companies.map((company, index) => (
+          <div
+            key={company.id}
             style={{ animationDelay: `${Math.min(index, 20) * 0.03}s` }}
           >
-            <CompanyCard 
-              company={company} 
-              onClick={() => onCompanyClick(company)} 
+            <CompanyCard
+              company={company}
+              onClick={() => onCompanyClick(company)}
             />
           </div>
         ))}
       </div>
+
+      {/* Infinite scroll sentinel */}
+      {hasNextPage && (
+        <div ref={sentinelRef} className="flex justify-center items-center py-8">
+          {isFetchingNextPage && (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          )}
+        </div>
+      )}
     </div>
   );
 }
