@@ -26,6 +26,39 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
     return companies.filter(c => getLetterKey(c.name) === activeLetter);
   }, [companies, activeLetter]);
 
+  // Progressive rendering: show first batch immediately, then grow after idle
+  // to free the main thread and dramatically improve TTI on initial load.
+  const INITIAL_BATCH = 60;
+  const BATCH_INCREMENT = 120;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_BATCH);
+  }, [activeLetter, companies]);
+
+  useEffect(() => {
+    if (visibleCount >= filteredCompanies.length) return;
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const schedule = w.requestIdleCallback
+      ? (cb: () => void) => w.requestIdleCallback!(cb, { timeout: 500 })
+      : (cb: () => void) => window.setTimeout(cb, 200);
+    const id = schedule(() => {
+      setVisibleCount(c => Math.min(c + BATCH_INCREMENT, filteredCompanies.length));
+    });
+    return () => {
+      const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+      if (cancel) cancel(id);
+      else window.clearTimeout(id);
+    };
+  }, [visibleCount, filteredCompanies.length]);
+
+  const visibleCompanies = useMemo(
+    () => filteredCompanies.slice(0, visibleCount),
+    [filteredCompanies, visibleCount]
+  );
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
