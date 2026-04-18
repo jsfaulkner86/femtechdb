@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Company } from '@/types/company';
 import { CompanyCard } from './CompanyCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +25,39 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
     if (!activeLetter) return companies;
     return companies.filter(c => getLetterKey(c.name) === activeLetter);
   }, [companies, activeLetter]);
+
+  // Progressive rendering: show first batch immediately, then grow after idle
+  // to free the main thread and dramatically improve TTI on initial load.
+  const INITIAL_BATCH = 60;
+  const BATCH_INCREMENT = 120;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_BATCH);
+  }, [activeLetter, companies]);
+
+  useEffect(() => {
+    if (visibleCount >= filteredCompanies.length) return;
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const schedule = w.requestIdleCallback
+      ? (cb: () => void) => w.requestIdleCallback!(cb, { timeout: 500 })
+      : (cb: () => void) => window.setTimeout(cb, 200);
+    const id = schedule(() => {
+      setVisibleCount(c => Math.min(c + BATCH_INCREMENT, filteredCompanies.length));
+    });
+    return () => {
+      const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+      if (cancel) cancel(id);
+      else window.clearTimeout(id);
+    };
+  }, [visibleCount, filteredCompanies.length]);
+
+  const visibleCompanies = useMemo(
+    () => filteredCompanies.slice(0, visibleCount),
+    [filteredCompanies, visibleCount]
+  );
 
   if (isLoading) {
     return (
@@ -86,7 +119,7 @@ export function CompanyGrid({ companies, isLoading, onCompanyClick, activeLetter
       </div>
       
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredCompanies.map((company, index) => (
+        {visibleCompanies.map((company, index) => (
           <div 
             key={company.id} 
             style={{ animationDelay: `${Math.min(index, 20) * 0.03}s` }}
