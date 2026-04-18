@@ -75,7 +75,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           <div className="h-10 w-10 rounded-lg border border-border/50 bg-muted overflow-hidden flex items-center justify-center">
               {company.logo_url && !logoError ? (
                 <img 
-                  src={company.logo_url} 
+                  src={company.logo_url.replace(/^http:\/\//i, 'https://')} 
                   alt={`${company.name} logo`}
                   className="h-full w-full object-contain"
                   onError={() => setLogoError(true)}
