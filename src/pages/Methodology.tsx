@@ -14,10 +14,16 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/SEO';
 
 export default function Methodology() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Methodology — How FemtechDB Curates Companies"
+        description="Discover how FemtechDB sources, verifies, categorizes, and updates its directory of femtech companies using AI-assisted research and human review."
+        path="/methodology"
+      />
       <Header />
       
       {/* Hero Section */}
