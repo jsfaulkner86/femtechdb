@@ -12,6 +12,7 @@ import { DatabaseStats } from '@/components/DatabaseStats';
 import { AlphabetNav } from '@/components/AlphabetNav';
 import { useCompanies, useCompanyCount } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
+import { SEO } from '@/components/SEO';
 import { useMemo } from 'react';
 
 
