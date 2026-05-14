@@ -12,6 +12,7 @@ import { CreateCompanyDialog } from '@/components/founder/CreateCompanyDialog';
 import { EditCompanyForm } from '@/components/founder/EditCompanyForm';
 import { useAuth } from '@/hooks/useAuth';
 import { useFounderClaims, useClaimedCompany } from '@/hooks/useFounderClaims';
+import { SEO } from '@/components/SEO';
 
 const statusConfig = {
   pending: { icon: Clock, label: 'Pending Review', variant: 'secondary' as const },
@@ -48,6 +49,11 @@ export default function FounderPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <SEO
+        title="Founder Portal — Claim or List Your Femtech Company"
+        description="Verified founders can claim an existing FemtechDB listing or submit a new femtech company for review."
+        path="/founder"
+      />
       <Header />
       
       <main className="container mx-auto px-4 py-12">

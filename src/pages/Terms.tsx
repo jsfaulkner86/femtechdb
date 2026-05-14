@@ -1,10 +1,16 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { SEO } from '@/components/SEO';
 import { FileText } from 'lucide-react';
 
 export default function Terms() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Terms of Service — FemtechDB"
+        description="Terms governing use of the FemtechDB directory of femtech companies, including acceptable use and content disclaimers."
+        path="/terms"
+      />
       <Header />
       
       <main className="flex-1">

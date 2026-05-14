@@ -1,10 +1,16 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { SEO } from '@/components/SEO';
 import { Shield } from 'lucide-react';
 
 export default function Privacy() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Privacy Policy — FemtechDB"
+        description="How FemtechDB collects, uses, and protects information for visitors of the femtech company directory."
+        path="/privacy"
+      />
       <Header />
       
       <main className="flex-1">

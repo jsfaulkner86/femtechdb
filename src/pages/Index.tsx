@@ -12,6 +12,7 @@ import { DatabaseStats } from '@/components/DatabaseStats';
 import { AlphabetNav } from '@/components/AlphabetNav';
 import { useCompanies, useCompanyCount } from '@/hooks/useCompanies';
 import { Company, FemtechCategory } from '@/types/company';
+import { SEO } from '@/components/SEO';
 import { useMemo } from 'react';
 
 
@@ -86,6 +87,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="FemtechDB — Global Femtech Company Directory"
+        description="Free directory of 970+ femtech companies transforming women's health: fertility, pregnancy, menopause, menstrual, mental, and hormonal health."
+        path="/"
+      />
       <Header />
       
       <main className="flex-1">
