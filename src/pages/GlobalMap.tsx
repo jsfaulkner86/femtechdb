@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { WorldMap } from '@/components/GlobalMap';
+import { SEO } from '@/components/SEO';
 import { Globe } from 'lucide-react';
 
 export default function GlobalMapPage() {
@@ -18,6 +19,11 @@ export default function GlobalMapPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Global Femtech Map — Companies by Country & Region"
+        description="Interactive world map of femtech companies. Explore women's health innovation by continent and country, and filter the directory by location."
+        path="/global-map"
+      />
       <Header />
 
       <main className="flex-1">
