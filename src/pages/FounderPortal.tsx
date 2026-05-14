@@ -49,6 +49,11 @@ export default function FounderPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <SEO
+        title="Founder Portal — Claim or List Your Femtech Company"
+        description="Verified founders can claim an existing FemtechDB listing or submit a new femtech company for review."
+        path="/founder"
+      />
       <Header />
       
       <main className="container mx-auto px-4 py-12">
