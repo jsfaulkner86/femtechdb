@@ -1,10 +1,16 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { SEO } from '@/components/SEO';
 import { Heart, Target, Users, Sparkles, Globe, TrendingUp, Lightbulb } from 'lucide-react';
 
 export default function About() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="About FemtechDB — The Global Femtech Company Directory"
+        description="Learn about FemtechDB, the free public directory of 970+ femtech companies transforming women's health worldwide. Built by The Faulkner Group."
+        path="/about"
+      />
       <Header />
       
       {/* Hero Section */}
