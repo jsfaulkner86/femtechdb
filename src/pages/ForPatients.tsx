@@ -1,12 +1,18 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ProblemSearch } from '@/components/ProblemSearch';
+import { SEO } from '@/components/SEO';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ForPatients = () => {
   const { t } = useLanguage();
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="For Patients — AI-Matched Femtech Solutions"
+        description="Describe your women's health concern and get matched with relevant femtech companies and solutions, free and without signup."
+        path="/for-patients"
+      />
       <Header />
       
       <main className="flex-1">
