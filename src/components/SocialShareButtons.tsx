@@ -1,5 +1,6 @@
 import { Linkedin, ExternalLink } from 'lucide-react';
 import backtableIcon from '@/assets/backtable-icon.png.asset.json';
+import faulknerIcon from '@/assets/faulkner-group-icon.png.asset.json';
 
 export function SocialShareButtons() {
   return (
@@ -40,7 +41,7 @@ export function SocialShareButtons() {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <ExternalLink className="h-3.5 w-3.5" />
+        <img src={faulknerIcon.url} alt="" className="h-3.5 w-3.5 rounded-sm object-cover" />
         The Faulkner Group
       </a>
     </div>
