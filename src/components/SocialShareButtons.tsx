@@ -1,127 +1,37 @@
-import { Linkedin, Twitter, Facebook, Mail, Link2, MessageCircle, Instagram, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { toast } from 'sonner';
-
-const SHARE_URL = 'https://femtechdb.lovable.app';
-const SHARE_TEXT = 'Discover FemtechDB — the most comprehensive directory of femtech companies transforming women\'s health 🌸';
-const SHARE_HASHTAGS = '#femtech #womenshealth #healthtech';
+import { Linkedin, ExternalLink } from 'lucide-react';
 
 export function SocialShareButtons() {
-  const [copied, setCopied] = useState(false);
-
-  const handleLinkedInShare = () => {
-    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`;
-    window.open(url, '_blank', 'noopener,noreferrer,width=600,height=500');
-  };
-
-  const handleTwitterShare = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`;
-    window.open(url, '_blank', 'noopener,noreferrer,width=600,height=400');
-  };
-
-  const handleFacebookShare = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`;
-    window.open(url, '_blank', 'noopener,noreferrer,width=600,height=400');
-  };
-
-  const handleWhatsAppShare = () => {
-    const url = `https://wa.me/?text=${encodeURIComponent(`${SHARE_TEXT} ${SHARE_URL}`)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleEmailShare = () => {
-    const subject = 'Check out FemtechDB - Global Femtech Directory';
-    const body = `${SHARE_TEXT}\n\n${SHARE_URL}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(SHARE_URL);
-      setCopied(true);
-      toast.success('Link copied to clipboard!');
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('Failed to copy link');
-    }
-  };
-
-  const handleInstagramCopy = async () => {
-    try {
-      const instagramText = `${SHARE_TEXT}\n\n${SHARE_HASHTAGS}\n\n${SHARE_URL}`;
-      await navigator.clipboard.writeText(instagramText);
-      toast.success('Caption copied! Paste it in your Instagram post');
-    } catch {
-      toast.error('Failed to copy');
-    }
-  };
-
   return (
-    <div className="flex flex-wrap items-center justify-center gap-1.5">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleLinkedInShare}
-        className="h-8 w-8 text-muted-foreground hover:text-[#0A66C2] hover:border-[#0A66C2]/30"
-        title="Share on LinkedIn"
+    <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+      <a
+        href="https://www.linkedin.com/in/johnathonfaulkner/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <Linkedin className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleTwitterShare}
-        className="h-8 w-8 text-muted-foreground hover:text-foreground hover:border-foreground/30"
-        title="Share on X/Twitter"
+        <Linkedin className="h-3.5 w-3.5" />
+        Johnathon Faulkner
+      </a>
+      <span className="text-border">•</span>
+      <a
+        href="https://www.linkedin.com/in/nicole-faulkner-d-o-1136a4370/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <Twitter className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleFacebookShare}
-        className="h-8 w-8 text-muted-foreground hover:text-[#1877F2] hover:border-[#1877F2]/30"
-        title="Share on Facebook"
+        <Linkedin className="h-3.5 w-3.5" />
+        Nicole Faulkner
+      </a>
+      <span className="text-border">•</span>
+      <a
+        href="https://thefaulknergroupadvisors.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <Facebook className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleWhatsAppShare}
-        className="h-8 w-8 text-muted-foreground hover:text-[#25D366] hover:border-[#25D366]/30"
-        title="Share on WhatsApp"
-      >
-        <MessageCircle className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleInstagramCopy}
-        className="h-8 w-8 text-muted-foreground hover:text-[#E4405F] hover:border-[#E4405F]/30"
-        title="Copy for Instagram"
-      >
-        <Instagram className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleEmailShare}
-        className="h-8 w-8 text-muted-foreground hover:text-primary hover:border-primary/30"
-        title="Share via Email"
-      >
-        <Mail className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleCopyLink}
-        className="h-8 w-8 text-muted-foreground hover:text-primary hover:border-primary/30"
-        title="Copy link"
-      >
-        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
-      </Button>
+        <ExternalLink className="h-3.5 w-3.5" />
+        The Faulkner Group
+      </a>
     </div>
   );
 }
