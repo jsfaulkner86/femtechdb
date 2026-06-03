@@ -120,7 +120,7 @@ export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
 
           {/* Last Updated */}
           {company.updated_at && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-muted/50 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
               <Clock className="h-3.5 w-3.5" />
               <span>
                 {t('Last updated')} {formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}
