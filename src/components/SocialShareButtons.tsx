@@ -1,6 +1,6 @@
-import { Linkedin, ExternalLink } from 'lucide-react';
 import backtableIcon from '@/assets/backtable-icon.png.asset.json';
 import faulknerIcon from '@/assets/faulkner-group-icon.png.asset.json';
+import linkedinIcon from '@/assets/linkedin-icon.png.asset.json';
 
 export function SocialShareButtons() {
   return (
@@ -11,7 +11,7 @@ export function SocialShareButtons() {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <Linkedin className="h-3.5 w-3.5" />
+        <img src={linkedinIcon.url} alt="" className="h-3.5 w-3.5 object-contain" />
         Johnathon Faulkner
       </a>
       <span className="text-border">•</span>
@@ -21,7 +21,7 @@ export function SocialShareButtons() {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
       >
-        <Linkedin className="h-3.5 w-3.5" />
+        <img src={linkedinIcon.url} alt="" className="h-3.5 w-3.5 object-contain" />
         Nicole Faulkner
       </a>
       <span className="text-border">•</span>
