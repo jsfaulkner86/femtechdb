@@ -120,7 +120,7 @@ serve(async (req) => {
             {
               role: "system",
               content: `You are a professional translator. Translate the following numbered texts from English to ${langName}. 
-Context: These are ${context || "UI texts"} for a women's health technology (femtech) directory website.
+Context: These are ${safeContext} for a women's health technology (femtech) directory website.
 Return ONLY a JSON object where keys are the original English texts and values are the ${langName} translations.
 Keep brand names, company names, URLs, and technical terms unchanged.
 Be concise and natural in ${langName}.`,
@@ -188,7 +188,7 @@ Be concise and natural in ${langName}.`,
             source_text: source,
             language_code: language,
             translated_text: translated as string,
-            context: context || "ui",
+            context: safeContext,
           }));
 
           if (rows.length > 0) {
