@@ -1,5 +1,6 @@
 import { Linkedin, ExternalLink } from 'lucide-react';
 import backtableIcon from '@/assets/backtable-icon.png.asset.json';
+import faulknerIcon from '@/assets/faulkner-group-icon.png.asset.json';
 
 export function SocialShareButtons() {
   return (
