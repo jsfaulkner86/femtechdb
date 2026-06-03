@@ -28,12 +28,37 @@ serve(async (req) => {
   try {
     const { texts, language, context } = await req.json();
 
-    if (!texts || !Array.isArray(texts) || !language) {
+    // --- Strict input validation (public endpoint; protects cache + AI credits) ---
+    const ALLOWED_LANGUAGES = Object.keys(languageNames);
+    const ALLOWED_CONTEXTS = new Set(["ui", "company", "category", "mission", "problem", "solution"]);
+    const MAX_TEXTS = 50;
+    const MAX_TEXT_LEN = 500;
+
+    if (!Array.isArray(texts) || texts.length === 0 || typeof language !== "string") {
       return new Response(
-        JSON.stringify({ error: "Missing texts array or language" }),
+        JSON.stringify({ error: "Missing or invalid texts array or language" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    if (!ALLOWED_LANGUAGES.includes(language)) {
+      return new Response(
+        JSON.stringify({ error: "Unsupported language" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (texts.length > MAX_TEXTS) {
+      return new Response(
+        JSON.stringify({ error: `Too many texts (max ${MAX_TEXTS})` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!texts.every((t) => typeof t === "string" && t.length > 0 && t.length <= MAX_TEXT_LEN)) {
+      return new Response(
+        JSON.stringify({ error: `Each text must be a non-empty string up to ${MAX_TEXT_LEN} chars` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const safeContext = typeof context === "string" && ALLOWED_CONTEXTS.has(context) ? context : "ui";
 
     if (language === "en") {
       // Return original texts for English
@@ -43,6 +68,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

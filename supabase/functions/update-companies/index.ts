@@ -143,29 +143,17 @@ Deno.serve(async (req) => {
       console.log(`Timezone check passed: ${body.timezone_check}, isEDT: ${isEDT}`);
     }
 
-    const authHeader = req.headers.get('Authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    // Auth: cron secret OR authenticated admin. The public anon key is NOT accepted.
+    const cronSecret = Deno.env.get('CRON_SECRET_KEY');
+    const providedCronSecret = req.headers.get('X-Cron-Secret');
+    const isCronCall = !!cronSecret && providedCronSecret === cronSecret;
 
-    // Check if this is a cron/anon call by decoding the JWT payload
-    let isCronCall = false;
-    if (token) {
-      try {
-        const payloadB64 = token.split('.')[1];
-        if (payloadB64) {
-          const payload = JSON.parse(atob(payloadB64));
-          // Anon key JWTs have role "anon" and match our project ref
-          isCronCall = payload.role === 'anon' && payload.iss === 'supabase';
-        }
-      } catch {
-        // Not a valid JWT, will go through normal auth
-      }
-    }
-
-    console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
+    console.log('Auth check - isCronCall:', isCronCall);
 
     if (isCronCall) {
-      console.log('Cron job authenticated via anon key JWT');
+      console.log('Cron job authenticated via shared secret');
     } else {
+      const authHeader = req.headers.get('Authorization');
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized - missing or invalid authorization header' }),
@@ -173,12 +161,13 @@ Deno.serve(async (req) => {
         );
       }
 
+      const token = authHeader.replace('Bearer ', '');
       const supabaseAuth = createClient(supabaseUrl, supabaseServiceKey, {
         global: { headers: { Authorization: authHeader } }
       });
 
-      const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token!);
-      
+      const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
+
       if (userError || !user) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized - invalid token' }),
@@ -216,6 +205,7 @@ Deno.serve(async (req) => {
 
       console.log(`Admin access verified for user: ${userId}`);
     }
+
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
