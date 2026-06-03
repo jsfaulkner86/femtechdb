@@ -150,7 +150,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
           {company.updated_at && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1 text-muted-foreground/60 cursor-help">
+                <div className="flex items-center gap-1 text-muted-foreground cursor-help">
                   <Clock className="h-3 w-3" />
                   <span>{formatDistanceToNow(new Date(company.updated_at), { addSuffix: true })}</span>
                 </div>
