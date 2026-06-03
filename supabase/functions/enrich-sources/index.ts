@@ -56,22 +56,13 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
 
-    // Auth check - same pattern as update-companies
-    const authHeader = req.headers.get('Authorization');
-    const cronSecretKey = Deno.env.get('CRON_SECRET_KEY');
-    const cronHeader = req.headers.get('X-Cron-Secret');
-    const token = authHeader?.replace('Bearer ', '');
-
-    // Use environment variable instead of hardcoded JWT
-    const anonKeyJwt = supabaseAnonKey;
-    
-    const isCronCall = token === anonKeyJwt || 
-                       authHeader === `Bearer ${anonKeyJwt}` ||
-                       (cronSecretKey && cronHeader === cronSecretKey);
-    
-    console.log('Auth check - token present:', !!token, 'isCronCall:', isCronCall);
+    // Auth: cron secret OR authenticated admin. The public anon key is NOT accepted.
+    const cronSecret = Deno.env.get('CRON_SECRET_KEY');
+    const providedCronSecret = req.headers.get('X-Cron-Secret');
+    const isCronCall = !!cronSecret && providedCronSecret === cronSecret;
 
     if (!isCronCall) {
+      const authHeader = req.headers.get('Authorization');
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized' }),
@@ -79,12 +70,12 @@ Deno.serve(async (req) => {
         );
       }
 
+      const token = authHeader.replace('Bearer ', '');
       const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } }
       });
 
-      const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token!);
-      
+      const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
       if (claimsError || !claimsData?.claims) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized - invalid token' }),
@@ -94,7 +85,6 @@ Deno.serve(async (req) => {
 
       const userId = claimsData.claims.sub;
       const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
       const { data: roleData } = await supabaseAdmin
         .from('user_roles')
         .select('role')
@@ -108,7 +98,10 @@ Deno.serve(async (req) => {
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+    } else {
+      console.log('Authenticated via cron secret');
     }
+
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
