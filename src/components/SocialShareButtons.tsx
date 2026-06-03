@@ -24,6 +24,16 @@ export function SocialShareButtons() {
       </a>
       <span className="text-border">•</span>
       <a
+        href="https://www.backtable.com/shows/obgyn"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+      >
+        <ExternalLink className="h-3.5 w-3.5" />
+        BackTable OBGYN
+      </a>
+      <span className="text-border">•</span>
+      <a
         href="https://thefaulknergroupadvisors.com/"
         target="_blank"
         rel="noopener noreferrer"
