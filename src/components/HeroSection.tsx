@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCompanyCount } from '@/hooks/useCompanies';
 import { useLanguage } from '@/contexts/LanguageContext';
+import faulknerIcon from '@/assets/faulkner-group-icon.png.asset.json';
 
 interface HeroSectionProps {
   searchQuery: string;
@@ -96,6 +97,20 @@ export const HeroSection = memo(function HeroSection({
               <span className="block text-2xl font-bold text-foreground">{t('Daily')}</span>
               <span className="text-muted-foreground">{t('Updates')}</span>
             </div>
+          </div>
+
+          {/* Attribution */}
+          <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <a
+              href="https://thefaulknergroupadvisors.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <span>{t('Created by')}</span>
+              <img src={faulknerIcon.url} alt="" className="h-4 w-4 rounded-sm object-cover" />
+              <span className="font-medium">The Faulkner Group</span>
+            </a>
           </div>
         </div>
       </div>
