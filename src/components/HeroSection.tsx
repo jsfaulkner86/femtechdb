@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCompanyCount } from '@/hooks/useCompanies';
 import { useLanguage } from '@/contexts/LanguageContext';
+import faulknerIcon from '@/assets/faulkner-group-icon.png.asset.json';
 
 interface HeroSectionProps {
   searchQuery: string;
