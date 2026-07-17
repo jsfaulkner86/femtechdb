@@ -76,7 +76,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               {company.logo_url && !logoError ? (
                 <img 
                   src={company.logo_url.replace(/^http:\/\//i, 'https://')} 
-                  alt={`${company.name} logo`}
+                  alt={company.name}
                   className="h-full w-full object-contain"
                   loading="lazy"
                   decoding="async"
@@ -98,7 +98,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
                 asChild
                 onClick={(e) => e.stopPropagation()}
               >
-                <SafeLink href={company.website_url}>
+                <SafeLink href={company.website_url} aria-label={`Visit ${company.name} website`}>
                   <ExternalLink className="h-4 w-4" />
                 </SafeLink>
               </Button>
