@@ -76,7 +76,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
               {company.logo_url && !logoError ? (
                 <img 
                   src={company.logo_url.replace(/^http:\/\//i, 'https://')} 
-                  alt={`${company.name} logo`}
+                  alt={company.name}
                   className="h-full w-full object-contain"
                   loading="lazy"
                   decoding="async"
