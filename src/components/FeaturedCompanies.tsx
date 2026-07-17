@@ -20,7 +20,7 @@ export function FeaturedCompanies({ onCompanyClick }: FeaturedCompaniesProps) {
     queryFn: async () => {
       // Get verified companies with most complete profiles, recently updated
       const { data, error } = await supabase
-        .from('companies')
+        .from('companies_public')
         .select('*')
         .eq('is_verified', true)
         .not('mission', 'is', null)
