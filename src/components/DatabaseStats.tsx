@@ -12,13 +12,8 @@ export function DatabaseStats() {
   const { data: stats } = useQuery({
     queryKey: ['database-stats'],
     queryFn: async () => {
-      // Get latest update time
-      const { data: latestCompany } = await supabase
-        .from('companies')
-        .select('updated_at')
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Timestamp of the last successful daily cron refresh
+      const { data: lastCronUpdate } = await supabase.rpc('get_last_cron_update');
 
       // Get verified count
       const { count: verifiedCount } = await supabase
@@ -27,7 +22,7 @@ export function DatabaseStats() {
         .eq('is_verified', true);
 
       return {
-        lastUpdated: latestCompany?.updated_at,
+        lastUpdated: lastCronUpdate as string | null,
         verifiedCount: verifiedCount ?? 0,
       };
     },
