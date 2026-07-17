@@ -23,7 +23,7 @@ export function DatabaseStats() {
       // Get verified count
       const { count: verifiedCount } = await supabase
         .from('companies')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('is_verified', true);
 
       return {
