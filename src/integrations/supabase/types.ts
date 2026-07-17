@@ -386,6 +386,7 @@ export type Database = {
       }
     }
     Functions: {
+      get_last_cron_update: { Args: never; Returns: string }
       get_non_conference_company_count: { Args: never; Returns: number }
       has_role: {
         Args: {
