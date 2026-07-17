@@ -38,17 +38,29 @@ export function useClaimedCompany(userId: string | undefined) {
     queryKey: ['claimed-company', userId],
     queryFn: async () => {
       if (!userId) return null;
-      
+
+      // Find the user's approved claim to get the company_id without
+      // querying the base companies table by claimed_by (which is no
+      // longer readable to authenticated clients for privacy reasons).
+      const { data: claim, error: claimError } = await supabase
+        .from('founder_claims')
+        .select('company_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved')
+        .maybeSingle();
+
+      if (claimError) throw claimError;
+      if (!claim) return null;
+
       const { data, error } = await supabase
-        .from('companies')
+        .from('companies_public')
         .select('*')
-        .eq('claimed_by', userId)
+        .eq('id', claim.company_id)
         .maybeSingle();
 
       if (error) throw error;
       if (!data) return null;
 
-      // Fetch categories for this company
       const { data: categories } = await supabase
         .from('company_categories')
         .select('category')
@@ -62,6 +74,7 @@ export function useClaimedCompany(userId: string | undefined) {
     enabled: !!userId,
   });
 }
+
 
 export function useSubmitClaim() {
   const queryClient = useQueryClient();
