@@ -168,6 +168,24 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_invocation_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          token?: string
+        }
+        Relationships: []
+      }
       founder_claims: {
         Row: {
           admin_notes: string | null
@@ -386,6 +404,10 @@ export type Database = {
       }
     }
     Functions: {
+      consume_cron_invocation_token: {
+        Args: { _token: string }
+        Returns: boolean
+      }
       get_last_cron_update: { Args: never; Returns: string }
       get_non_conference_company_count: { Args: never; Returns: number }
       has_role: {
