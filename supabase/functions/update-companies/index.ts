@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
 
     // Parse request body for timezone check
-    let body: { timezone_check?: string } = {};
+    let body: { timezone_check?: string; cron_token?: string } = {};
     try {
       body = await req.json();
     } catch {
@@ -143,10 +143,22 @@ Deno.serve(async (req) => {
       console.log(`Timezone check passed: ${body.timezone_check}, isEDT: ${isEDT}`);
     }
 
-    // Auth: cron secret OR authenticated admin. The public anon key is NOT accepted.
+    // Auth: one-time scheduler token, legacy cron secret, or authenticated admin.
+    // Scheduler tokens are consumed atomically and expire after five minutes.
+    const schedulerClient = createClient(supabaseUrl, supabaseServiceKey);
+    let hasValidSchedulerToken = false;
+    if (body.cron_token) {
+      const { data: tokenAccepted, error: tokenError } = await schedulerClient.rpc(
+        'consume_cron_invocation_token',
+        { _token: body.cron_token },
+      );
+      if (tokenError) console.error('Scheduler token validation failed:', tokenError);
+      hasValidSchedulerToken = tokenAccepted === true;
+    }
+
     const cronSecret = Deno.env.get('CRON_SECRET_KEY');
     const providedCronSecret = req.headers.get('X-Cron-Secret');
-    const isCronCall = !!cronSecret && providedCronSecret === cronSecret;
+    const isCronCall = hasValidSchedulerToken || (!!cronSecret && providedCronSecret === cronSecret);
 
     console.log('Auth check - isCronCall:', isCronCall);
 
