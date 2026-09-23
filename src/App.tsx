@@ -14,6 +14,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const FounderPortal = lazy(() => import("./pages/FounderPortal"));
 const ForPatients = lazy(() => import("./pages/ForPatients"));
+const FertilityCompanies = lazy(() => import("./pages/FertilityCompanies"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/founder" element={<FounderPortal />} />
               <Route path="/for-patients" element={<ForPatients />} />
+              <Route path="/category/fertility" element={<FertilityCompanies />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
