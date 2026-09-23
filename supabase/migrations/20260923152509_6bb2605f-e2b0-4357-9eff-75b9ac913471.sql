@@ -1,0 +1,1 @@
+GRANT SELECT (id, name, mission, problem, solution, category, website_url, logo_url, founded_year, headquarters, is_verified, created_at, updated_at, source_url, continent, country, state, commercialization_phase) ON public.companies TO authenticated, anon;
