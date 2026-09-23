@@ -22,6 +22,7 @@ export function Footer() {
             <Link to="/about" className="hover:text-foreground transition-colors">{t('About')}</Link>
             <Link to="/methodology" className="hover:text-foreground transition-colors">{t('Methodology')}</Link>
             <Link to="/global-map" className="hover:text-foreground transition-colors">{t('Global Map')}</Link>
+            <Link to="/category/fertility" className="hover:text-foreground transition-colors">{t('Fertility Companies')}</Link>
           </nav>
 
           <div className="flex flex-col items-center md:items-end gap-3">
