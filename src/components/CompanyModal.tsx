@@ -16,8 +16,8 @@ interface CompanyModalProps {
 }
 
 export function CompanyModal({ company, isOpen, onClose }: CompanyModalProps) {
-  if (!company) return null;
   const { t } = useLanguage();
+  if (!company) return null;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
